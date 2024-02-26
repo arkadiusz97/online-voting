@@ -1,6 +1,6 @@
-package com.github.arkadiusz97.online.voting.controllers;
+package com.github.arkadiusz97.online.voting.controller;
 
-import com.github.arkadiusz97.online.voting.domain.About;
+import com.github.arkadiusz97.online.voting.dto.responsebody.About;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

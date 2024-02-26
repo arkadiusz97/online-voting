@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -21,9 +22,13 @@ public class UserOption {
     @Id
     @GeneratedValue
     private Long id;
+
+    @NotNull
     @ManyToOne
     @JoinColumn(name="user_id")
     private User user;
+
+    @NotNull
     @ManyToOne
     @JoinColumn(name="option_id")
     private Option option;

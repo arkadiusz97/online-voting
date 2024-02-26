@@ -3,6 +3,7 @@ package com.github.arkadiusz97.online.voting.domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -21,8 +22,17 @@ public class User {
     @Id
     @GeneratedValue
     private Long id;
+
+    @NotNull
     private String email;
+
+    @NotNull
     private String password;
+
+    @NotNull
     private Date created;
+
+    @NotNull
     private Boolean isAdmin;
+
 }

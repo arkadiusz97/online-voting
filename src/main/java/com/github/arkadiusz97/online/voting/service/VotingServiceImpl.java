@@ -1,4 +1,4 @@
-package com.github.arkadiusz97.online.voting.services;
+package com.github.arkadiusz97.online.voting.service;
 
 import org.springframework.stereotype.Service;
 
