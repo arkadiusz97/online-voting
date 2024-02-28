@@ -8,6 +8,6 @@ public interface UserService {
     String registerNew(String recipient);
     void sendMessage(String recipient);
     UserDTO show(Long id);
-    List<UserDTO> showMany(Integer integer, Integer valueOf);
+    List<UserDTO> showMany(Integer pageNumber, Integer pageSize);
     void delete(Long id);
 }
