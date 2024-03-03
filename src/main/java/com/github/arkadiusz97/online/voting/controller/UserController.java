@@ -14,10 +14,10 @@ import java.util.List;
 @RestController
 @RequestMapping("user")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
-    public UserController(@Qualifier("userServiceImpl") UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
     @PostMapping("register-new")
