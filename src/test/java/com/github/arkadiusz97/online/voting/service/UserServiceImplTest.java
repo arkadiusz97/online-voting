@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -30,6 +31,9 @@ public class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder; //todo check
+
     @BeforeEach
     public void setup() {
         LinkedList<User> usersToSave = SampleDomains.getSampleUsers();
@@ -40,7 +44,7 @@ public class UserServiceImplTest {
         List<User> usersFromPage = Arrays.asList(usersToSave.get(3), usersToSave.get(4));
         Page<User> userPage = new PageImpl<>(usersFromPage, pageRequest, 2);
         Mockito.when(userRepository.findAll(pageRequest)).thenReturn(userPage);
-        userServiceImpl = new UserServiceImpl(userRepository);
+        userServiceImpl = new UserServiceImpl(userRepository, passwordEncoder); //todo check
     }
 
     @Test

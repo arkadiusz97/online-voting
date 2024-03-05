@@ -1,5 +1,6 @@
 package com.github.arkadiusz97.online.voting.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -23,7 +24,7 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    @NotNull
+    @Column(nullable = false, unique = true)
     private String email;
 
     @NotNull
