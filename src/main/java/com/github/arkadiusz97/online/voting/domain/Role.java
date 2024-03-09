@@ -1,28 +1,24 @@
 package com.github.arkadiusz97.online.voting.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.Date;
 import java.util.Set;
 
-@Entity(name="online_voting_user")
+@Entity(name="online_voting_role")
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Getter
 @Setter
-public class User {
+public class Role {
 
-    public User(String email, String password, Date created) {
-        this.email = email;
-        this.password = password;
-        this.created = created;
+    public Role(String name) {
+        this.name = name;
     }
 
     @Id
@@ -30,14 +26,8 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String name;
 
-    @NotNull
-    private String password;
-
-    @NotNull
-    private Date created;
-
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "role")
     private Set<UserRole> usersRoles;
 }

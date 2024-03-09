@@ -31,22 +31,22 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return true; //todo implement later
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return true; //todo implement later
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return true; //todo implement later
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return true; //todo implement later
     }
 
     public User getUser() {

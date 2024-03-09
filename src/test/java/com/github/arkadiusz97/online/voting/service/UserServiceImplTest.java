@@ -2,7 +2,9 @@ package com.github.arkadiusz97.online.voting.service;
 
 import com.github.arkadiusz97.online.voting.domain.User;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
+import com.github.arkadiusz97.online.voting.repository.RoleRepository;
 import com.github.arkadiusz97.online.voting.repository.UserRepository;
+import com.github.arkadiusz97.online.voting.repository.UserRoleRepository;
 import com.github.arkadiusz97.online.voting.utils.SampleDomains;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,13 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private PasswordEncoder passwordEncoder; //todo check
+    private UserRoleRepository userRoleRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     public void setup() {
@@ -44,7 +52,7 @@ public class UserServiceImplTest {
         List<User> usersFromPage = Arrays.asList(usersToSave.get(3), usersToSave.get(4));
         Page<User> userPage = new PageImpl<>(usersFromPage, pageRequest, 2);
         Mockito.when(userRepository.findAll(pageRequest)).thenReturn(userPage);
-        userServiceImpl = new UserServiceImpl(userRepository, passwordEncoder); //todo check
+        userServiceImpl = new UserServiceImpl(userRepository, passwordEncoder, userRoleRepository, roleRepository); //todo check
     }
 
     @Test

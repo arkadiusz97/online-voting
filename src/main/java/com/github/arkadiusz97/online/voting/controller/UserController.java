@@ -23,7 +23,7 @@ public class UserController {
     @PostMapping("register-new")
     public ResponseEntity<GenericResponse> registerNew(@RequestBody String someStr) {
         GenericResponse result = new GenericResponse(
-            userService.registerNew(someStr)
+            userService.registerNewUser(someStr)
         );
         return new ResponseEntity<GenericResponse>(result, HttpStatusCode.valueOf(200));
     }
