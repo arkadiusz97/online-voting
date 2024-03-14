@@ -59,7 +59,6 @@ public class UserServiceImplTest {
     public void whenShowMany_thenGetUsers() {
         List<UserDTO> users = userServiceImpl.showMany(1, 2);
         assertThat("some-mail4@domain.eu").isEqualTo(users.get(0).email());
-        assertThat(false).isEqualTo(users.get(1).isAdmin());
         assertThat(2).isEqualTo(users.size());
     }
 }

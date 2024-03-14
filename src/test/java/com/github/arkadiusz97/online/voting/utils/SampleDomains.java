@@ -9,11 +9,11 @@ public class SampleDomains {
     public static LinkedList<User> getSampleUsers() {
         LinkedList<User> sampleUsers = new LinkedList<>();
         Date now = new Date();
-        sampleUsers.add(new User(1L, "some-mail1@domain.eu", "abc123", now, false));
-        sampleUsers.add(new User(2L, "some-mail2@domain.eu", "abc", now, true));
-        sampleUsers.add(new User(3L, "some-mail3@domain.eu", "abc999", now, false));
-        sampleUsers.add(new User(4L, "some-mail4@domain.eu", "111", now, true));
-        sampleUsers.add(new User(5L, "some-mail5@domain.eu", "eeee", now, false));
+        sampleUsers.add(new User("some-mail1@domain.eu", "abc123", now));
+        sampleUsers.add(new User("some-mail2@domain.eu", "abc", now));
+        sampleUsers.add(new User("some-mail3@domain.eu", "abc999", now));
+        sampleUsers.add(new User("some-mail4@domain.eu", "111", now));
+        sampleUsers.add(new User("some-mail5@domain.eu", "eeee", now));
         return sampleUsers;
     }
 }

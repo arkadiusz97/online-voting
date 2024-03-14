@@ -19,7 +19,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.Collection;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -87,12 +91,15 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserDTO getDTO(final User user) {
+        Set<UserRole> userRoles = user.getUsersRoles();
+        Stream<UserRole> userRolesStream = Optional.ofNullable(userRoles)
+            .map(Collection::stream)
+            .orElseGet(Stream::empty);
         return new UserDTO(
             user.getId(),
             user.getEmail(),
             user.getCreated(),
-            user.getUsersRoles()
-                .stream()
+                userRolesStream
                 .map(this::getRoleDTO)
                 .collect(Collectors.toList())
         );
