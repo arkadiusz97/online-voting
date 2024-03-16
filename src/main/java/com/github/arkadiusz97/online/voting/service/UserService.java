@@ -9,7 +9,8 @@ public interface UserService {
     public String registerNewAdmin(String recipient);
     String registerNew(String recipient, String role);
     void sendMessage(String recipient);
-    UserDTO show(Long id);
+    UserDTO getById(Long id);
+    UserDTO getByEmail(String email);
     List<UserDTO> showMany(Integer pageNumber, Integer pageSize);
     void delete(Long id);
 }

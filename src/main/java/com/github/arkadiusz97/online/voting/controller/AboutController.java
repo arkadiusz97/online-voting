@@ -13,7 +13,7 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("about")
-@Secured("ROLE_ADMINa")//todo change after tests
+@Secured("ROLE_ADMIN")//todo move to service
 public class AboutController {
     @GetMapping("")
     public ResponseEntity<About> about() { //todo refactor, remove hardcoded version

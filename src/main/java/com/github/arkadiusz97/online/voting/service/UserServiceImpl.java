@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
@@ -72,8 +73,12 @@ public class UserServiceImpl implements UserService {
         //todo implement
     }
 
-    public UserDTO show(Long id) {
+    public UserDTO getById(Long id) {
         return getDTO(userRepository.findById(id).get());//todo chage get
+    }
+
+    public UserDTO getByEmail(String email) {
+        return getDTO(userRepository.findByEmail(email));//todo chage get
     }
 
     public List<UserDTO> showMany(Integer pageNumber, Integer pageSize) {
@@ -99,7 +104,7 @@ public class UserServiceImpl implements UserService {
             user.getId(),
             user.getEmail(),
             user.getCreated(),
-                userRolesStream
+            userRolesStream
                 .map(this::getRoleDTO)
                 .collect(Collectors.toList())
         );

@@ -1,5 +1,6 @@
 package com.github.arkadiusz97.online.voting.controller;
 
+import com.github.arkadiusz97.online.voting.domain.User;
 import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponse;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.service.UserService;
@@ -10,11 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
+@Secured("ROLE_ADMIN") //todo move to service
 @RestController
 @RequestMapping("user")
-@Secured("ROLE_ADMIN")
 public class UserController {
     private final UserService userService;
 
@@ -36,9 +38,17 @@ public class UserController {
         return new ResponseEntity<List<UserDTO>>(result, HttpStatusCode.valueOf(200));
     }
 
+    @Secured("ROLE_USER")
+    @GetMapping("show-current-user")
+    public ResponseEntity<UserDTO> showCurrentUser(Principal principal) {
+        String userEmail = principal.getName();
+        UserDTO result = userService.getByEmail(userEmail);
+        return new ResponseEntity<UserDTO>(result, HttpStatusCode.valueOf(200));
+    }
+
     @GetMapping("show/{id}")
     public ResponseEntity<UserDTO> show(@PathVariable String id) {
-        UserDTO result = userService.show(Long.valueOf(id));
+        UserDTO result = userService.getById(Long.valueOf(id));
         return new ResponseEntity<UserDTO>(result, HttpStatusCode.valueOf(200));
     }
 
