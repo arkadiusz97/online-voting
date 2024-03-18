@@ -1,20 +1,18 @@
 package com.github.arkadiusz97.online.voting.controller;
 
-import com.github.arkadiusz97.online.voting.domain.User;
 import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponse;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
 
-@Secured("ROLE_ADMIN") //todo move to service
+@PreAuthorize("hasRole('ROLE_ADMIN')")//todo move to service
 @RestController
 @RequestMapping("user")
 public class UserController {
@@ -38,7 +36,7 @@ public class UserController {
         return new ResponseEntity<List<UserDTO>>(result, HttpStatusCode.valueOf(200));
     }
 
-    @Secured("ROLE_USER")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("show-current-user")
     public ResponseEntity<UserDTO> showCurrentUser(Principal principal) {
         String userEmail = principal.getName();
