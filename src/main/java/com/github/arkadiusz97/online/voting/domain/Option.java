@@ -19,6 +19,12 @@ import lombok.ToString;
 @Getter
 @Setter
 public class Option {
+
+    public Option(String description, Voting voting) {
+        this.description = description;
+        this.voting = voting;
+    }
+
     @Id
     @GeneratedValue
     private Long id;

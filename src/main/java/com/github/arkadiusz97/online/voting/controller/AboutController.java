@@ -1,6 +1,7 @@
 package com.github.arkadiusz97.online.voting.controller;
 
 import com.github.arkadiusz97.online.voting.dto.responsebody.About;
+import com.github.arkadiusz97.online.voting.service.AboutService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,8 +15,15 @@ import java.util.Date;
 @RequestMapping("about")
 @PreAuthorize("hasRole('ROLE_ADMIN')")//todo move to service
 public class AboutController {
+
+    private final AboutService aboutService;
+
+    public AboutController(AboutService aboutService) {
+        this.aboutService = aboutService;
+    }
     @GetMapping("")
-    public ResponseEntity<About> about() { //todo refactor, remove hardcoded version
-        return new ResponseEntity<About>(new About("1.0", new Date()), HttpStatusCode.valueOf(200));
+    public ResponseEntity<About> about() {
+        About about = aboutService.getAbout();
+        return new ResponseEntity<About>(about, HttpStatusCode.valueOf(200));
     }
 }

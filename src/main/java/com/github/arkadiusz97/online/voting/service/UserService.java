@@ -1,5 +1,6 @@
 package com.github.arkadiusz97.online.voting.service;
 
+import com.github.arkadiusz97.online.voting.domain.User;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 
 import java.util.List;
@@ -13,4 +14,6 @@ public interface UserService {
     UserDTO getByEmail(String email);
     List<UserDTO> showMany(Integer pageNumber, Integer pageSize);
     void delete(Long id);
+    User getCurrentUser();
+    public UserDTO getDTO(final User user);
 }
