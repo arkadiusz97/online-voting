@@ -19,6 +19,12 @@ import lombok.ToString;
 @Getter
 @Setter
 public class UserOption {
+
+    public UserOption(User user, Option option) {
+        this.user = user;
+        this.option = option;
+    }
+
     @Id
     @GeneratedValue
     private Long id;

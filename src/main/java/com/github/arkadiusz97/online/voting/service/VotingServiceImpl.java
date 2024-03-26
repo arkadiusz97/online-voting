@@ -1,15 +1,11 @@
 package com.github.arkadiusz97.online.voting.service;
 
-import com.github.arkadiusz97.online.voting.domain.Option;
-import com.github.arkadiusz97.online.voting.domain.User;
-import com.github.arkadiusz97.online.voting.domain.UserRole;
-import com.github.arkadiusz97.online.voting.domain.Voting;
+import com.github.arkadiusz97.online.voting.domain.*;
 import com.github.arkadiusz97.online.voting.dto.requestbody.CreateVotingDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.OptionDTO;
-import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDTO;
 import com.github.arkadiusz97.online.voting.repository.OptionRepository;
-import com.github.arkadiusz97.online.voting.repository.UserRepository;
+import com.github.arkadiusz97.online.voting.repository.UserOptionRepository;
 import com.github.arkadiusz97.online.voting.repository.VotingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,14 +21,15 @@ public class VotingServiceImpl implements VotingService {
     private final VotingRepository votingRepository;
     private final OptionRepository optionRepository;
     private final UserService userService;
+    private final UserOptionRepository userOptionRepository;
 
     @Autowired
-    public VotingServiceImpl(VotingRepository votingRepository,
-        OptionRepository optionRepository, UserService userService) {
-
+    public VotingServiceImpl(VotingRepository votingRepository, OptionRepository optionRepository,
+            UserService userService, UserOptionRepository userOptionRepository) {
         this.votingRepository = votingRepository;
         this.optionRepository = optionRepository;
         this.userService = userService;
+        this.userOptionRepository = userOptionRepository;
     }
 
     public String create(CreateVotingDTO createVotingDTO) {//todo add validation, etc
@@ -44,7 +41,7 @@ public class VotingServiceImpl implements VotingService {
     }
 
     public VotingWithOptionsDTO get(Long id) {
-        return getDTO(votingRepository.findById(id).get());//todo chage get
+        return getDTO(votingRepository.findById(id).get());//todo throw error instead of returning value by get
     }
 
     public List<VotingWithOptionsDTO> showMany(Integer pageNumber, Integer pageSize) {
@@ -56,8 +53,17 @@ public class VotingServiceImpl implements VotingService {
             .collect(Collectors.toList());
     }
 
-    public String vote(Long votingId, Long optionId) {
-        return null;//todo implement
+    public void vote(Long optionId) {
+        User currentUser = userService.getCurrentUser();
+        Optional<Option> selectedOptionOpt = optionRepository.findById(optionId);
+        if(selectedOptionOpt.isPresent()) {
+            Option selectedOption = selectedOptionOpt.get();
+            UserOption userOption = new UserOption(currentUser, selectedOption);
+            //todo add checking if user already voted
+            userOptionRepository.save(userOption);
+        } else {
+            //throw new Exception("Option with id %d not found", Long.valueOf(optionId));//todo change to own exception class
+        }
     }
 
     public String delete(Long votingId) {

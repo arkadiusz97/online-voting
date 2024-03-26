@@ -1,6 +1,7 @@
 package com.github.arkadiusz97.online.voting.controller;
 
 import com.github.arkadiusz97.online.voting.dto.requestbody.CreateVotingDTO;
+import com.github.arkadiusz97.online.voting.dto.requestbody.VoteDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponse;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDTO;
@@ -52,6 +53,13 @@ public class VotingController {
     public ResponseEntity<GenericResponse> delete(@PathVariable String id) {
         votingService.delete(Long.valueOf(id));
         GenericResponse result = new GenericResponse("Voting " + id + " deleted");
+        return new ResponseEntity<GenericResponse>(result, HttpStatusCode.valueOf(200));
+    }
+
+    @PostMapping("vote")
+    public ResponseEntity<GenericResponse> vote(@RequestBody VoteDTO voteDTO) {
+        votingService.vote(voteDTO.optionId());
+        GenericResponse result = new GenericResponse("User voted");
         return new ResponseEntity<GenericResponse>(result, HttpStatusCode.valueOf(200));
     }
 }

@@ -9,6 +9,6 @@ public interface VotingService {
     String create(CreateVotingDTO createVotingDTO);
     VotingWithOptionsDTO get(Long id);
     List<VotingWithOptionsDTO> showMany(Integer pageNumber, Integer pageSize);
-    String vote(Long votingId, Long optionId);
+    void vote(Long optionId);
     String delete(Long votingId);
 }
