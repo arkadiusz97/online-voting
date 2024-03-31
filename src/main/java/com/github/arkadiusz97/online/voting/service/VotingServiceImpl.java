@@ -15,14 +15,18 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.Collection;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -39,13 +43,16 @@ public class VotingServiceImpl implements VotingService {
         voting = votingRepository.save(voting);
         List<Option> options = getVotingOptionsFromVoting(createVotingDTO, voting);
         options.forEach(optionRepository::save);
+        logger.debug("Created voting with description '{}'", createVotingDTO.description());
     }
 
     public VotingWithOptionsDTO get(Long id) {
+        logger.debug("Get voting with id", id);
         return getDTO(votingRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
     }
 
     public List<VotingWithOptionsDTO> showMany(Integer pageNumber, Integer pageSize) {
+        logger.debug("Show many votings with page number {} and page size", pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return votingRepository
             .findAll(pageable)
@@ -59,7 +66,7 @@ public class VotingServiceImpl implements VotingService {
         Optional<Option> selectedOptionOpt = optionRepository.findById(optionId);
         if(selectedOptionOpt.isEmpty()) {
             String errorMessage = String.format("Option with id %d not found", Long.valueOf(optionId));
-            logger.info(errorMessage);
+            logger.debug(errorMessage);
             throw new OptionNotFoundException();
         }
         Option selectedOption = selectedOptionOpt.get();
@@ -71,13 +78,25 @@ public class VotingServiceImpl implements VotingService {
         }
     }
 
+    @Transactional
     public void delete(Long votingId) {
+        logger.debug("Called delete voting with id {}", votingId);
         Voting voting = votingRepository.findById(votingId).orElseThrow(ResourceNotFoundException::new);
+
+        List<UserOption> userOptions = userOptionRepository.findAll();
+        userOptions.forEach( userOption -> {
+            if(userOption.getOption().getVoting().getId().equals(votingId)) {
+                userOptionRepository.delete(userOption);
+            }
+        });
+
         List<Option> options = optionRepository.findAllByVoting(voting);
         options.forEach(option -> { //todo use one query
             optionRepository.deleteById(option.getId());
         });
+
         votingRepository.deleteById(votingId);
+        logger.debug("Deleted voting {}", String.valueOf(votingId));
     }
 
     private boolean checkIfUserDidntVote(Option selectedOption, User currentUser) {
@@ -87,10 +106,11 @@ public class VotingServiceImpl implements VotingService {
                         uo.getOption().getVoting().equals(selectedOption.getVoting())
                 ).findFirst();
         if(optionWithCurrentVoting.isPresent()) {
-            logger.info("User has already voted in this voting");
+            logger.debug("User {} has already voted in voting {}", currentUser.getEmail(),
+                selectedOption.getDescription());
             return false;
         }
-        logger.info("User has't voted in this voting yet");
+        logger.debug("User {} has't voted in this voting yet", currentUser.getEmail());
         return true;
     }
 

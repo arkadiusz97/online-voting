@@ -32,7 +32,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(OptionNotFoundException.class)
     public ResponseEntity<GenericResponse> handleOptionNotFoundException() {
-        GenericResponse response = new GenericResponse("Option with not found");
+        GenericResponse response = new GenericResponse("Option not found");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 

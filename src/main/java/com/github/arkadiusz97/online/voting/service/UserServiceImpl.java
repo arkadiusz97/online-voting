@@ -11,9 +11,12 @@ import com.github.arkadiusz97.online.voting.exception.UserAlreadyExistsException
 import com.github.arkadiusz97.online.voting.repository.RoleRepository;
 import com.github.arkadiusz97.online.voting.repository.UserRepository;
 import com.github.arkadiusz97.online.voting.repository.UserRoleRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -66,7 +69,7 @@ public class UserServiceImpl implements UserService {
         userRoleRepository.save(userRole);
 
         String message = String.format("Registered a new user with %s email", recipient);
-        logger.info(message);
+        logger.debug(message);
         return message;
     }
 
@@ -75,14 +78,17 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDTO getById(Long id) {
+        logger.debug("Called getById with id {}", id);
         return getDTO(userRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
     }
 
     public UserDTO getByEmail(String email) {
-        return getDTO(userRepository.findByEmail(email));//todo chage get
+        logger.debug("Called getByEmail with email {}", email);
+        return getDTO(userRepository.findByEmail(email));
     }
 
     public List<UserDTO> showMany(Integer pageNumber, Integer pageSize) {
+        logger.debug("Called showMany with pageNumber {} and pageSize {}", pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return userRepository
             .findAll(pageable)
@@ -96,16 +102,18 @@ public class UserServiceImpl implements UserService {
         if(userRepository.existsById(id)) {
             userRoleRepository.deleteAllByUser(userRepository.findById(id).get());
             userRepository.deleteById(id);
-            logger.info("Removed user with {} id", id);
+            logger.debug("Removed user with {} id", id);
         } else {
-            logger.warn("User with {} id not exists", id);
+            logger.debug("User with {} id not exists", id);
             throw new ResourceNotFoundException();
         }
     }
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userRepository.findByEmail(authentication.getName());
+        String email = authentication.getName();
+        logger.debug("Called getCurrentUser with email {}", email);
+        return userRepository.findByEmail(email);
     }
 
     public UserDTO getDTO(final User user) {
