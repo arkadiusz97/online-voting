@@ -52,7 +52,7 @@ public class UserServiceImplTest {
         List<User> usersFromPage = Arrays.asList(usersToSave.get(3), usersToSave.get(4));
         Page<User> userPage = new PageImpl<>(usersFromPage, pageRequest, 2);
         Mockito.when(userRepository.findAll(pageRequest)).thenReturn(userPage);
-        userServiceImpl = new UserServiceImpl(userRepository, passwordEncoder, userRoleRepository, roleRepository); //todo check
+        userServiceImpl = new UserServiceImpl(userRepository, userRoleRepository, roleRepository, passwordEncoder);
     }
 
     @Test

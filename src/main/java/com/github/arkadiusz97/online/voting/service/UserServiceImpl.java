@@ -9,6 +9,7 @@ import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.repository.RoleRepository;
 import com.github.arkadiusz97.online.voting.repository.UserRepository;
 import com.github.arkadiusz97.online.voting.repository.UserRoleRepository;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import java.util.Collection;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
@@ -37,15 +38,6 @@ public class UserServiceImpl implements UserService {
     private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           UserRoleRepository userRoleRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userRoleRepository = userRoleRepository;
-        this.roleRepository = roleRepository;
-    }
 
     public String registerNewUser(String recipient) {
         return registerNew(recipient, "ROLE_USER");

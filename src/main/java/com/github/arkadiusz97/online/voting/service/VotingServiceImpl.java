@@ -7,6 +7,11 @@ import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDT
 import com.github.arkadiusz97.online.voting.repository.OptionRepository;
 import com.github.arkadiusz97.online.voting.repository.UserOptionRepository;
 import com.github.arkadiusz97.online.voting.repository.VotingRepository;
+
+import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,20 +22,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class VotingServiceImpl implements VotingService {
     private final VotingRepository votingRepository;
     private final OptionRepository optionRepository;
     private final UserService userService;
     private final UserOptionRepository userOptionRepository;
 
-    @Autowired
-    public VotingServiceImpl(VotingRepository votingRepository, OptionRepository optionRepository,
-            UserService userService, UserOptionRepository userOptionRepository) {
-        this.votingRepository = votingRepository;
-        this.optionRepository = optionRepository;
-        this.userService = userService;
-        this.userOptionRepository = userOptionRepository;
-    }
+    private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
     public String create(CreateVotingDTO createVotingDTO) {//todo add validation, etc
         Voting voting = getVotingFromDto(createVotingDTO);
@@ -56,13 +55,15 @@ public class VotingServiceImpl implements VotingService {
     public void vote(Long optionId) {
         User currentUser = userService.getCurrentUser();
         Optional<Option> selectedOptionOpt = optionRepository.findById(optionId);
-        if(selectedOptionOpt.isPresent()) {
-            Option selectedOption = selectedOptionOpt.get();
-            UserOption userOption = new UserOption(currentUser, selectedOption);
-            //todo add checking if user already voted
+        if(selectedOptionOpt.isEmpty()) {
+            String errorMessage = String.format("Option with id %d not found", Long.valueOf(optionId));
+            logger.info(errorMessage);
+            return;//throw new Exception();//todo change to own exception class
+        }
+        Option selectedOption = selectedOptionOpt.get();
+        UserOption userOption = new UserOption(currentUser, selectedOption);
+        if(checkIfUserDidntVote(selectedOption, currentUser)) {
             userOptionRepository.save(userOption);
-        } else {
-            //throw new Exception("Option with id %d not found", Long.valueOf(optionId));//todo change to own exception class
         }
     }
 
@@ -76,12 +77,25 @@ public class VotingServiceImpl implements VotingService {
         return "deleted";//todo implement checking
     }
 
+    private boolean checkIfUserDidntVote(Option selectedOption, User currentUser) {
+        List<UserOption> userOptions = userOptionRepository.findAllByUser(currentUser);
+        Optional<UserOption> optionWithCurrentVoting = userOptions.stream()
+                .filter( uo ->
+                        uo.getOption().getVoting().equals(selectedOption.getVoting())
+                ).findFirst();
+        if(optionWithCurrentVoting.isPresent()) {
+            logger.info("User has already voted in this voting");
+            return false;
+        }
+        logger.info("User has't voted in this voting yet");
+        return true;
+    }
+
     private Voting getVotingFromDto(CreateVotingDTO createVotingDTO) {
         Voting voting = new Voting();
         voting.setDescription(createVotingDTO.description());
         voting.setEndDate(createVotingDTO.endDate());
         voting.setCreatedDate(new Date());
-        voting.setIsFinished(false);
         voting.setCreatedBy(userService.getCurrentUser());
         return voting;
     }
@@ -96,7 +110,6 @@ public class VotingServiceImpl implements VotingService {
             voting.getDescription(),
             voting.getEndDate(),
             voting.getCreatedDate(),
-            voting.getIsFinished(),
             userService.getDTO(voting.getCreatedBy()),
             optionStream
                 .map(this::getOptionDTO)

@@ -3,6 +3,7 @@ package com.github.arkadiusz97.online.voting.controller;
 import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponse;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +16,11 @@ import java.util.List;
 @PreAuthorize("hasRole('ROLE_ADMIN')")//todo move to service
 @RestController
 @RequestMapping("user")
+@RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
     @PostMapping("register-new")
     public ResponseEntity<GenericResponse> registerNew(@RequestBody String someStr) {
         GenericResponse result = new GenericResponse(

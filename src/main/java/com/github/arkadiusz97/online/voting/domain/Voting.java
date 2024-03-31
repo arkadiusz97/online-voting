@@ -35,9 +35,6 @@ public class Voting {
     private Date createdDate;
 
     @NotNull
-    private Boolean isFinished;
-
-    @NotNull
     @ManyToOne
     @JoinColumn(name="created_by_id")
     private User createdBy;

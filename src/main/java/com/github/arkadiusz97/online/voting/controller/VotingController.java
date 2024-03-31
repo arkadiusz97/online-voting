@@ -3,28 +3,23 @@ package com.github.arkadiusz97.online.voting.controller;
 import com.github.arkadiusz97.online.voting.dto.requestbody.CreateVotingDTO;
 import com.github.arkadiusz97.online.voting.dto.requestbody.VoteDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponse;
-import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDTO;
 import com.github.arkadiusz97.online.voting.service.VotingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @PreAuthorize("hasRole('ROLE_USER')")//todo move to service
 @RestController
 @RequestMapping("voting")
+@RequiredArgsConstructor
 public class VotingController {
     private final VotingService votingService;
-
-    @Autowired
-    public VotingController(VotingService votingService) {
-        this.votingService = votingService;
-    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("create")

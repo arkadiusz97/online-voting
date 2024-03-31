@@ -2,6 +2,7 @@ package com.github.arkadiusz97.online.voting.controller;
 
 import com.github.arkadiusz97.online.voting.dto.responsebody.About;
 import com.github.arkadiusz97.online.voting.service.AboutService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,13 +15,11 @@ import java.util.Date;
 @RestController
 @RequestMapping("about")
 @PreAuthorize("hasRole('ROLE_ADMIN')")//todo move to service
+@RequiredArgsConstructor
 public class AboutController {
 
     private final AboutService aboutService;
 
-    public AboutController(AboutService aboutService) {
-        this.aboutService = aboutService;
-    }
     @GetMapping("")
     public ResponseEntity<About> about() {
         About about = aboutService.getAbout();
