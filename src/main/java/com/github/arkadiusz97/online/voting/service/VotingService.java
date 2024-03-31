@@ -6,9 +6,9 @@ import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDT
 import java.util.List;
 
 public interface VotingService {
-    String create(CreateVotingDTO createVotingDTO);
+    void create(CreateVotingDTO createVotingDTO);
     VotingWithOptionsDTO get(Long id);
     List<VotingWithOptionsDTO> showMany(Integer pageNumber, Integer pageSize);
     void vote(Long optionId);
-    String delete(Long votingId);
+    void delete(Long votingId);
 }

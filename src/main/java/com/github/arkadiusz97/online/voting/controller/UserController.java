@@ -5,6 +5,7 @@ import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,13 +27,13 @@ public class UserController {
         GenericResponse result = new GenericResponse(
             userService.registerNewUser(someStr)
         );
-        return new ResponseEntity<GenericResponse>(result, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @GetMapping("show")
     public ResponseEntity<List<UserDTO>> showMany(@RequestParam String pageNumber, @RequestParam String pageSize) {
         List<UserDTO> result = userService.showMany(Integer.valueOf(pageNumber), Integer.valueOf(pageSize));
-        return new ResponseEntity<List<UserDTO>>(result, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -40,19 +41,19 @@ public class UserController {
     public ResponseEntity<UserDTO> showCurrentUser(Principal principal) {
         String userEmail = principal.getName();
         UserDTO result = userService.getByEmail(userEmail);
-        return new ResponseEntity<UserDTO>(result, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("show/{id}")
     public ResponseEntity<UserDTO> show(@PathVariable String id) {
         UserDTO result = userService.getById(Long.valueOf(id));
-        return new ResponseEntity<UserDTO>(result, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("delete/{id}")
     public ResponseEntity<GenericResponse> delete(@PathVariable String id) {
         userService.delete(Long.valueOf(id));
-        GenericResponse result = new GenericResponse("User " + id + "deleted");
-        return new ResponseEntity<GenericResponse>(result, HttpStatusCode.valueOf(200));
+        GenericResponse result = new GenericResponse("User " + id + " deleted");
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

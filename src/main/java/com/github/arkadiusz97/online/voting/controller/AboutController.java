@@ -23,6 +23,6 @@ public class AboutController {
     @GetMapping("")
     public ResponseEntity<About> about() {
         About about = aboutService.getAbout();
-        return new ResponseEntity<About>(about, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(about, HttpStatusCode.valueOf(200));
     }
 }

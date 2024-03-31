@@ -4,6 +4,9 @@ import com.github.arkadiusz97.online.voting.domain.*;
 import com.github.arkadiusz97.online.voting.dto.requestbody.CreateVotingDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.OptionDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDTO;
+import com.github.arkadiusz97.online.voting.exception.OptionNotFoundException;
+import com.github.arkadiusz97.online.voting.exception.ResourceNotFoundException;
+import com.github.arkadiusz97.online.voting.exception.UserAlreadyVotedException;
 import com.github.arkadiusz97.online.voting.repository.OptionRepository;
 import com.github.arkadiusz97.online.voting.repository.UserOptionRepository;
 import com.github.arkadiusz97.online.voting.repository.VotingRepository;
@@ -31,16 +34,15 @@ public class VotingServiceImpl implements VotingService {
 
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
-    public String create(CreateVotingDTO createVotingDTO) {//todo add validation, etc
+    public void create(CreateVotingDTO createVotingDTO) {
         Voting voting = getVotingFromDto(createVotingDTO);
         voting = votingRepository.save(voting);
         List<Option> options = getVotingOptionsFromVoting(createVotingDTO, voting);
         options.forEach(optionRepository::save);
-        return "created";
     }
 
     public VotingWithOptionsDTO get(Long id) {
-        return getDTO(votingRepository.findById(id).get());//todo throw error instead of returning value by get
+        return getDTO(votingRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
     }
 
     public List<VotingWithOptionsDTO> showMany(Integer pageNumber, Integer pageSize) {
@@ -58,23 +60,24 @@ public class VotingServiceImpl implements VotingService {
         if(selectedOptionOpt.isEmpty()) {
             String errorMessage = String.format("Option with id %d not found", Long.valueOf(optionId));
             logger.info(errorMessage);
-            return;//throw new Exception();//todo change to own exception class
+            throw new OptionNotFoundException();
         }
         Option selectedOption = selectedOptionOpt.get();
         UserOption userOption = new UserOption(currentUser, selectedOption);
         if(checkIfUserDidntVote(selectedOption, currentUser)) {
             userOptionRepository.save(userOption);
+        } else {
+            throw new UserAlreadyVotedException();
         }
     }
 
-    public String delete(Long votingId) {
-        Voting voting = votingRepository.findById(votingId).get();//todo implement checking not existing voting
+    public void delete(Long votingId) {
+        Voting voting = votingRepository.findById(votingId).orElseThrow(ResourceNotFoundException::new);
         List<Option> options = optionRepository.findAllByVoting(voting);
         options.forEach(option -> { //todo use one query
             optionRepository.deleteById(option.getId());
         });
         votingRepository.deleteById(votingId);
-        return "deleted";//todo implement checking
     }
 
     private boolean checkIfUserDidntVote(Option selectedOption, User currentUser) {
