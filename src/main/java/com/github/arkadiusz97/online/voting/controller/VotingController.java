@@ -2,7 +2,8 @@ package com.github.arkadiusz97.online.voting.controller;
 
 import com.github.arkadiusz97.online.voting.dto.requestbody.CreateVotingDTO;
 import com.github.arkadiusz97.online.voting.dto.requestbody.VoteDTO;
-import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponse;
+import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponseDTO;
+import com.github.arkadiusz97.online.voting.dto.responsebody.VotingSummaryDto;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDTO;
 import com.github.arkadiusz97.online.voting.service.VotingService;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +19,14 @@ import java.util.List;
 @RequestMapping("voting")
 @RequiredArgsConstructor
 public class VotingController {
+
     private final VotingService votingService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("create")
-    public ResponseEntity<GenericResponse> create(@RequestBody CreateVotingDTO createVotingDTO) {
+    public ResponseEntity<GenericResponseDTO> create(@RequestBody CreateVotingDTO createVotingDTO) {
         votingService.create(createVotingDTO);
-        GenericResponse result = new GenericResponse("created");
+        GenericResponseDTO result = new GenericResponseDTO("created");
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
@@ -43,16 +45,23 @@ public class VotingController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<GenericResponse> delete(@PathVariable String id) {
+    public ResponseEntity<GenericResponseDTO> delete(@PathVariable String id) {
         votingService.delete(Long.valueOf(id));
-        GenericResponse result = new GenericResponse("Voting " + id + " deleted");
+        GenericResponseDTO result = new GenericResponseDTO("Voting " + id + " deleted");
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("vote")
-    public ResponseEntity<GenericResponse> vote(@RequestBody VoteDTO voteDTO) {
+    public ResponseEntity<GenericResponseDTO> vote(@RequestBody VoteDTO voteDTO) {
         votingService.vote(voteDTO.optionId());
-        GenericResponse result = new GenericResponse("User voted");
+        GenericResponseDTO result = new GenericResponseDTO("User voted");
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @GetMapping("result/{id}")
+    public ResponseEntity<VotingSummaryDto> getVotingResult(@PathVariable String id) {
+        VotingSummaryDto result = votingService.getVotingResult(Long.valueOf(id));
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }

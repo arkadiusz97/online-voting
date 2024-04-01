@@ -1,6 +1,6 @@
 package com.github.arkadiusz97.online.voting.service;
 
-import com.github.arkadiusz97.online.voting.dto.responsebody.About;
+import com.github.arkadiusz97.online.voting.dto.responsebody.AboutDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +17,10 @@ public class AboutServiceImpl implements AboutService {
     public AboutServiceImpl(@Value("${app-version}") String version) {
         this.version = version;
     }
-    public About getAbout() {
+
+    @Override
+    public AboutDTO getAbout() {
         logger.debug("Called about method");
-        return new About(version, new Date());
+        return new AboutDTO(version, new Date());
     }
 }

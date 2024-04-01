@@ -3,6 +3,8 @@ package com.github.arkadiusz97.online.voting.service;
 import com.github.arkadiusz97.online.voting.domain.*;
 import com.github.arkadiusz97.online.voting.dto.requestbody.CreateVotingDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.OptionDTO;
+import com.github.arkadiusz97.online.voting.dto.responsebody.OptionResultDTO;
+import com.github.arkadiusz97.online.voting.dto.responsebody.VotingSummaryDto;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDTO;
 import com.github.arkadiusz97.online.voting.exception.OptionNotFoundException;
 import com.github.arkadiusz97.online.voting.exception.ResourceNotFoundException;
@@ -20,13 +22,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Collection;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +44,7 @@ public class VotingServiceImpl implements VotingService {
 
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
+    @Override
     public void create(CreateVotingDTO createVotingDTO) {
         Voting voting = getVotingFromDto(createVotingDTO);
         voting = votingRepository.save(voting);
@@ -46,11 +53,13 @@ public class VotingServiceImpl implements VotingService {
         logger.debug("Created voting with description '{}'", createVotingDTO.description());
     }
 
+    @Override
     public VotingWithOptionsDTO get(Long id) {
         logger.debug("Get voting with id", id);
         return getDTO(votingRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
     }
 
+    @Override
     public List<VotingWithOptionsDTO> showMany(Integer pageNumber, Integer pageSize) {
         logger.debug("Show many votings with page number {} and page size", pageNumber, pageSize);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -61,7 +70,9 @@ public class VotingServiceImpl implements VotingService {
             .collect(Collectors.toList());
     }
 
+    @Override
     public void vote(Long optionId) {
+        logger.debug("Vote at option {}", optionId);
         User currentUser = userService.getCurrentUser();
         Optional<Option> selectedOptionOpt = optionRepository.findById(optionId);
         if(selectedOptionOpt.isEmpty()) {
@@ -78,6 +89,28 @@ public class VotingServiceImpl implements VotingService {
         }
     }
 
+    @Override
+    public VotingSummaryDto getVotingResult(Long votingId) {
+        Optional<Voting> votingOptional = votingRepository.findById(votingId);
+        Voting voting = votingOptional.orElseThrow(ResourceNotFoundException::new);
+        List<Option> choosenOptions = getChoosenOptionsByVoting(voting);
+        HashMap<String, Long> votesOnOptions = getNumberOfVotesOnOptions(choosenOptions);
+        List<OptionResultDTO> optionResults = new LinkedList<>();
+        int totalNumberOfChoices = choosenOptions.size();
+        votesOnOptions.forEach((k, v) -> {
+            BigDecimal percentageOfChoices = new BigDecimal(v)
+                .divide(new BigDecimal(totalNumberOfChoices))
+                .multiply(new BigDecimal(100));
+            optionResults.add(new OptionResultDTO(k, Long.valueOf(v), percentageOfChoices));
+        });
+        boolean isFinished = checkIfVotingIsFinished(voting);
+        List<String> winningOptions = getWinningOptions(optionResults);
+        VotingSummaryDto result = new VotingSummaryDto(voting.getDescription(), Long.valueOf(totalNumberOfChoices),
+            optionResults, winningOptions, isFinished);
+        return result;
+    }
+
+    @Override
     @Transactional
     public void delete(Long votingId) {
         logger.debug("Called delete voting with id {}", votingId);
@@ -99,11 +132,55 @@ public class VotingServiceImpl implements VotingService {
         logger.debug("Deleted voting {}", String.valueOf(votingId));
     }
 
+    private List<String> getWinningOptions(List<OptionResultDTO> optionResults) {
+        Optional<OptionResultDTO> winningFirstOptionOptional = optionResults.stream()
+            .max(Comparator.comparing(OptionResultDTO::numberOfChoices));
+        if(winningFirstOptionOptional.isEmpty()) {
+            return Collections.emptyList();
+        }
+        OptionResultDTO winningFirstOption = winningFirstOptionOptional.get();
+        List<String> result = optionResults.stream().filter( or ->
+            or.numberOfChoices().equals(winningFirstOption.numberOfChoices())
+            && or.optionDescription() != winningFirstOption.optionDescription()
+        ).map(OptionResultDTO::optionDescription)
+        .collect(Collectors.toList());
+        result.add(winningFirstOption.optionDescription());
+        return result;
+    }
+
+    private boolean checkIfVotingIsFinished(Voting voting) {
+        Date now = new Date();
+        return now.after(voting.getEndDate());
+    }
+
+    private List<Option> getChoosenOptionsByVoting(Voting voting) {
+        return userOptionRepository.findAll().stream()
+            .filter( uo ->
+                uo.getOption().getVoting().getId().equals(voting.getId())
+            )
+            .map(UserOption::getOption)
+            .collect(Collectors.toList());
+    }
+
+    private HashMap<String, Long> getNumberOfVotesOnOptions(List<Option> choosenOptions) {
+        HashMap<String, Long> votesOnOptions = new HashMap<>();
+        choosenOptions.forEach( option -> {
+            String optionDescription = option.getDescription();
+            if(votesOnOptions.containsKey(optionDescription)) {
+                Long votesOnOption = votesOnOptions.get(optionDescription);
+                votesOnOptions.put(optionDescription, votesOnOption + 1);
+            } else {
+                votesOnOptions.put(optionDescription, 1L);
+            }
+        });
+       return votesOnOptions;
+    }
+
     private boolean checkIfUserDidntVote(Option selectedOption, User currentUser) {
         List<UserOption> userOptions = userOptionRepository.findAllByUser(currentUser);
         Optional<UserOption> optionWithCurrentVoting = userOptions.stream()
                 .filter( uo ->
-                        uo.getOption().getVoting().equals(selectedOption.getVoting())
+                        uo.getOption().getVoting().getId().equals(selectedOption.getVoting().getId())
                 ).findFirst();
         if(optionWithCurrentVoting.isPresent()) {
             logger.debug("User {} has already voted in voting {}", currentUser.getEmail(),

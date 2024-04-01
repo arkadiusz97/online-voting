@@ -1,6 +1,6 @@
 package com.github.arkadiusz97.online.voting.controller;
 
-import com.github.arkadiusz97.online.voting.dto.responsebody.About;
+import com.github.arkadiusz97.online.voting.dto.responsebody.AboutDTO;
 import com.github.arkadiusz97.online.voting.service.AboutService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -19,8 +19,8 @@ public class AboutController {
     private final AboutService aboutService;
 
     @GetMapping("")
-    public ResponseEntity<About> about() {
-        About about = aboutService.getAbout();
+    public ResponseEntity<AboutDTO> about() {
+        AboutDTO about = aboutService.getAbout();
         return new ResponseEntity<>(about, HttpStatusCode.valueOf(200));
     }
 }

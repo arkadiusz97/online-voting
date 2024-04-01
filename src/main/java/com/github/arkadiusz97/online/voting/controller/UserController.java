@@ -1,6 +1,6 @@
 package com.github.arkadiusz97.online.voting.controller;
 
-import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponse;
+import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponseDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("register-new")
-    public ResponseEntity<GenericResponse> registerNew(@RequestBody String someStr) {
-        GenericResponse result = new GenericResponse(
+    public ResponseEntity<GenericResponseDTO> registerNew(@RequestBody String someStr) {
+        GenericResponseDTO result = new GenericResponseDTO(
             userService.registerNewUser(someStr)
         );
         return new ResponseEntity<>(result, HttpStatus.CREATED);
@@ -49,9 +49,9 @@ public class UserController {
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<GenericResponse> delete(@PathVariable String id) {
+    public ResponseEntity<GenericResponseDTO> delete(@PathVariable String id) {
         userService.delete(Long.valueOf(id));
-        GenericResponse result = new GenericResponse("User " + id + " deleted");
+        GenericResponseDTO result = new GenericResponseDTO("User " + id + " deleted");
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
