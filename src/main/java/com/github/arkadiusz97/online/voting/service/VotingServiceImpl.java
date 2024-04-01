@@ -6,9 +6,7 @@ import com.github.arkadiusz97.online.voting.dto.responsebody.OptionDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.OptionResultDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingSummaryDto;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDTO;
-import com.github.arkadiusz97.online.voting.exception.OptionNotFoundException;
-import com.github.arkadiusz97.online.voting.exception.ResourceNotFoundException;
-import com.github.arkadiusz97.online.voting.exception.UserAlreadyVotedException;
+import com.github.arkadiusz97.online.voting.exception.*;
 import com.github.arkadiusz97.online.voting.repository.OptionRepository;
 import com.github.arkadiusz97.online.voting.repository.UserOptionRepository;
 import com.github.arkadiusz97.online.voting.repository.VotingRepository;
@@ -46,6 +44,9 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public void create(CreateVotingDTO createVotingDTO) {
+        if(new Date().after(createVotingDTO.endDate())) {
+            throw new VotingEndDateIsBehindTodayException();
+        }
         Voting voting = getVotingFromDto(createVotingDTO);
         voting = votingRepository.save(voting);
         List<Option> options = getVotingOptionsFromVoting(createVotingDTO, voting);
@@ -81,6 +82,10 @@ public class VotingServiceImpl implements VotingService {
             throw new OptionNotFoundException();
         }
         Option selectedOption = selectedOptionOpt.get();
+        Voting votingForSelectedOption = selectedOption.getVoting();
+        if(new Date().after(votingForSelectedOption.getEndDate())) {
+            throw new VotingIsExpiredException();
+        }
         UserOption userOption = new UserOption(currentUser, selectedOption);
         if(checkIfUserDidntVote(selectedOption, currentUser)) {
             userOptionRepository.save(userOption);

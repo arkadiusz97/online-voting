@@ -1,10 +1,7 @@
 package com.github.arkadiusz97.online.voting.controller;
 
 import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponseDTO;
-import com.github.arkadiusz97.online.voting.exception.OptionNotFoundException;
-import com.github.arkadiusz97.online.voting.exception.ResourceNotFoundException;
-import com.github.arkadiusz97.online.voting.exception.UserAlreadyExistsException;
-import com.github.arkadiusz97.online.voting.exception.UserAlreadyVotedException;
+import com.github.arkadiusz97.online.voting.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -39,6 +36,18 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<GenericResponseDTO> handleUserAlreadyExistsException() {
         GenericResponseDTO response = new GenericResponseDTO("User already exists");
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(VotingIsExpiredException.class)
+    public ResponseEntity<GenericResponseDTO> handleVotingIsExpiredException() {
+        GenericResponseDTO response = new GenericResponseDTO("Voting is expired");
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(VotingEndDateIsBehindTodayException.class)
+    public ResponseEntity<GenericResponseDTO> handleVotingEndDateIsBehindTodayException() {
+        GenericResponseDTO response = new GenericResponseDTO("Voting end date is behind today");
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 

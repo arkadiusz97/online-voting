@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,4 +33,19 @@ public class UserRepositoryTest {
         assertThat("some-mail3@domain.eu").isEqualTo(users.get(0).getEmail());
         assertThat("111").isEqualTo(users.get(1).getPassword());
     }
+
+    @Test
+    public void findByEmail_ThenReturnWantedUsers() {
+        LinkedList<User> usersToSave = SampleDomains.getSampleUsers();
+        usersToSave.forEach(user -> {
+            userRepository.save(user);
+        });
+        String email = "some-mail4@domain.eu";
+        User user = userRepository.findByEmail(email);
+
+        assertThat(5).isEqualTo(userRepository.findAll().size());
+        assertThat(email).isEqualTo(user.getEmail());
+        assertThat("111").isEqualTo(user.getPassword());
+    }
+
 }
