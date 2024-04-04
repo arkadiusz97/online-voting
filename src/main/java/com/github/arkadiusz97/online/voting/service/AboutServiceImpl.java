@@ -12,9 +12,9 @@ import java.util.Date;
 public class AboutServiceImpl implements AboutService {
 
     private final String version;
-    private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(AboutServiceImpl.class);
 
-    public AboutServiceImpl(@Value("${app-version}") String version) {
+    public AboutServiceImpl(@Value("${online-voting.app-version}") String version) {
         this.version = version;
     }
 

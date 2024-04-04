@@ -9,6 +9,7 @@ public interface UserService {
     public String registerNewUser(String recipient);
     public String registerNewAdmin(String recipient);
     String registerNew(String recipient, String role);
+    String registerNew(String recipient, String role, String password);
     void sendMessage(String recipient);
     UserDTO getById(Long id);
     UserDTO getByEmail(String email);

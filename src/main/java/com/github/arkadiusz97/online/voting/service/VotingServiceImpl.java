@@ -40,7 +40,7 @@ public class VotingServiceImpl implements VotingService {
     private final UserService userService;
     private final UserOptionRepository userOptionRepository;
 
-    private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(VotingServiceImpl.class);
 
     @Override
     public void create(CreateVotingDTO createVotingDTO) {
