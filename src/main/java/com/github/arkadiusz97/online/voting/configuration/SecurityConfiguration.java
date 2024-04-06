@@ -43,7 +43,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable) //todo check csrf - now needed to resolve 401 http error on POST requests
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests( authorize -> {
                 authorize.anyRequest().authenticated();
             })

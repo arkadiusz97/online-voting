@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@PreAuthorize("hasRole('ROLE_USER')")//todo move to service
+@PreAuthorize("hasRole('ROLE_USER')")
 @RestController
 @RequestMapping("voting")
 @RequiredArgsConstructor

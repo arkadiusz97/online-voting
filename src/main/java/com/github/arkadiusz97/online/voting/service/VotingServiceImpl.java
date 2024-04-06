@@ -129,7 +129,7 @@ public class VotingServiceImpl implements VotingService {
         });
 
         List<Option> options = optionRepository.findAllByVoting(voting);
-        options.forEach(option -> { //todo use one query
+        options.forEach(option -> {
             optionRepository.deleteById(option.getId());
         });
 
@@ -239,4 +239,5 @@ public class VotingServiceImpl implements VotingService {
             option.getDescription()
         );
     }
+
 }

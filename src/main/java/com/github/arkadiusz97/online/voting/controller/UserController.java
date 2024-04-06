@@ -1,5 +1,7 @@
 package com.github.arkadiusz97.online.voting.controller;
 
+import com.github.arkadiusz97.online.voting.dto.requestbody.ChangePasswordDTO;
+import com.github.arkadiusz97.online.voting.dto.requestbody.NewUserDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.GenericResponseDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 import com.github.arkadiusz97.online.voting.service.UserService;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-@PreAuthorize("hasRole('ROLE_ADMIN')")//todo move to service
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RestController
 @RequestMapping("user")
 @RequiredArgsConstructor
@@ -21,9 +23,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("register-new")
-    public ResponseEntity<GenericResponseDTO> registerNew(@RequestBody String someStr) {
+    public ResponseEntity<GenericResponseDTO> registerNew(@RequestBody NewUserDTO dto) {
         GenericResponseDTO result = new GenericResponseDTO(
-            userService.registerNewUser(someStr)
+            userService.registerNewUser(dto.recipient())
         );
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
@@ -54,4 +56,11 @@ public class UserController {
         GenericResponseDTO result = new GenericResponseDTO("User " + id + " deleted");
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @PostMapping("change-password")
+    public ResponseEntity<Void> registerNew(@RequestBody ChangePasswordDTO dto) {
+        userService.changeCurrentUserPassword(dto.newPassword());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }

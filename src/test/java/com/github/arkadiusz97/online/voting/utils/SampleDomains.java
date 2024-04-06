@@ -1,11 +1,13 @@
 package com.github.arkadiusz97.online.voting.utils;
 
 import com.github.arkadiusz97.online.voting.domain.User;
+import com.github.arkadiusz97.online.voting.domain.Voting;
 
 import java.util.Date;
 import java.util.LinkedList;
 
 public class SampleDomains {
+
     public static LinkedList<User> getSampleUsers() {
         LinkedList<User> sampleUsers = new LinkedList<>();
         Date now = new Date();
@@ -16,4 +18,17 @@ public class SampleDomains {
         sampleUsers.add(new User("some-mail5@domain.eu", "eeee", now));
         return sampleUsers;
     }
+
+    public static LinkedList<Voting> getSampleVotings(User user) {
+        LinkedList<Voting> sampleVotings = new LinkedList<>();
+        Date now = new Date();
+        Date tomorrow = new Date(now.getTime() + (1000 * 60 * 60 * 24));
+
+        sampleVotings.add(new Voting(0L, "voting 1", tomorrow, now, user));
+        sampleVotings.add(new Voting(0L, "voting 2", tomorrow, now, user));
+        sampleVotings.add(new Voting(0L, "voting 3", tomorrow, now, user));
+
+        return sampleVotings;
+    }
+
 }

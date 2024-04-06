@@ -51,4 +51,13 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(NotSecurePasswordException.class)
+    public ResponseEntity<GenericResponseDTO> handleNotSecurePasswordException() {
+        GenericResponseDTO response = new GenericResponseDTO(
+            "Password doesn't meet security requirements. Please use at least 8 characters, at least one digit, " +
+            "at least one one lower-case letter and at least one upper-case letter."
+        );
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
 }

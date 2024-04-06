@@ -26,27 +26,27 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null; //todo implement later
+        return null;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; //todo implement later
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; //todo implement later
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; //todo implement later
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; //todo implement later
+        return true;
     }
 
     public User getUser() {

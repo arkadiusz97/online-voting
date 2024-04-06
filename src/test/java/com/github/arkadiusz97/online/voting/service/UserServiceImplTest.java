@@ -42,6 +42,12 @@ public class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private MailService mailService;
+
+    @Mock
+    private PasswordGeneratorService passwordGeneratorService;
+
     @BeforeEach
     public void setup() {
         LinkedList<User> usersToSave = SampleDomains.getSampleUsers();
@@ -52,7 +58,8 @@ public class UserServiceImplTest {
         List<User> usersFromPage = Arrays.asList(usersToSave.get(3), usersToSave.get(4));
         Page<User> userPage = new PageImpl<>(usersFromPage, pageRequest, 2);
         Mockito.when(userRepository.findAll(pageRequest)).thenReturn(userPage);
-        userServiceImpl = new UserServiceImpl(userRepository, userRoleRepository, roleRepository, passwordEncoder);
+        userServiceImpl = new UserServiceImpl(userRepository, userRoleRepository, roleRepository, mailService,
+            passwordEncoder, passwordGeneratorService);
     }
 
     @Test
