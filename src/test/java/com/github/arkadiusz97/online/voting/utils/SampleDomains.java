@@ -1,5 +1,6 @@
 package com.github.arkadiusz97.online.voting.utils;
 
+import com.github.arkadiusz97.online.voting.domain.Option;
 import com.github.arkadiusz97.online.voting.domain.User;
 import com.github.arkadiusz97.online.voting.domain.Voting;
 
@@ -7,6 +8,10 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class SampleDomains {
+
+    public static User getSampleUser() {
+        return new User("some-mail1@domain.eu", "abc123", new Date());
+    }
 
     public static LinkedList<User> getSampleUsers() {
         LinkedList<User> sampleUsers = new LinkedList<>();
@@ -29,6 +34,14 @@ public class SampleDomains {
         sampleVotings.add(new Voting(0L, "voting 3", tomorrow, now, user));
 
         return sampleVotings;
+    }
+
+    public static LinkedList<Option> getSampleOptions(Voting voting) {
+        LinkedList<Option> sampleOptions = new LinkedList<>();
+        sampleOptions.add(new Option("opt1", voting));
+        sampleOptions.add(new Option("opt2", voting));
+        sampleOptions.add(new Option("opt3", voting));
+        return sampleOptions;
     }
 
 }

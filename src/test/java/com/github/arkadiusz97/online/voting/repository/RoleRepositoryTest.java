@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RoleRepositoryTest {
 
     @Autowired
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Test
     public void whenFindByName_ThenReturnWantedRoles() {
