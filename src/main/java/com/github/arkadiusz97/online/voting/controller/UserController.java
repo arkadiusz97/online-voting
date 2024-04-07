@@ -22,7 +22,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("register-new")
+    @PostMapping("register")
     public ResponseEntity<GenericResponseDTO> registerNew(@RequestBody NewUserDTO dto) {
         GenericResponseDTO result = new GenericResponseDTO(
             userService.registerNewUser(dto.recipient())
@@ -30,21 +30,21 @@ public class UserController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @GetMapping("show")
+    @GetMapping("get")
     public ResponseEntity<List<UserDTO>> showMany(@RequestParam String pageNumber, @RequestParam String pageSize) {
         List<UserDTO> result = userService.showMany(Integer.valueOf(pageNumber), Integer.valueOf(pageSize));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("show-current-user")
+    @GetMapping("get-current")
     public ResponseEntity<UserDTO> showCurrentUser(Principal principal) {
         String userEmail = principal.getName();
         UserDTO result = userService.getByEmail(userEmail);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("show/{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<UserDTO> show(@PathVariable String id) {
         UserDTO result = userService.getById(Long.valueOf(id));
         return new ResponseEntity<>(result, HttpStatus.OK);
