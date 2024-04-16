@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -104,7 +105,7 @@ public class VotingServiceImpl implements VotingService {
         int totalNumberOfChoices = choosenOptions.size();
         votesOnOptions.forEach((k, v) -> {
             BigDecimal percentageOfChoices = new BigDecimal(v)
-                .divide(new BigDecimal(totalNumberOfChoices))
+                .divide(new BigDecimal(totalNumberOfChoices), 4, RoundingMode.HALF_DOWN)
                 .multiply(new BigDecimal(100));
             optionResults.add(new OptionResultDTO(k, Long.valueOf(v), percentageOfChoices));
         });
