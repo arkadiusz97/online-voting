@@ -3,14 +3,25 @@ package com.github.arkadiusz97.online.voting.utils;
 import com.github.arkadiusz97.online.voting.domain.Option;
 import com.github.arkadiusz97.online.voting.domain.User;
 import com.github.arkadiusz97.online.voting.domain.Voting;
+import com.github.arkadiusz97.online.voting.dto.responsebody.RoleDTO;
+import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 public class SampleDomains {
 
     public static User getSampleUser() {
         return new User("some-mail1@domain.eu", "abc123", new Date());
+    }
+
+    public static UserDTO getSampleUserDTO() {
+        String email = "some-mail1@domain.eu";
+        Date now = new Date();
+        List<RoleDTO> singleRoleDTO = Collections.singletonList(new RoleDTO("ROLE_USER"));
+        return new UserDTO(1L, email, now, singleRoleDTO);
     }
 
     public static LinkedList<User> getSampleUsers() {
