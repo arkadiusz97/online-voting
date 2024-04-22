@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collections;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,7 +32,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 public class UserControllerTest {
 
     @MockBean
-    UserService userService;
+    private UserService userService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,8 +47,8 @@ public class UserControllerTest {
         Mockito.when(userService.registerNewUser(newUserDTO.recipient())).thenReturn(responseString);
 
         mockMvc.perform(post("/user/register").with(csrf())
-                .content(mapper.writeValueAsString(newUserDTO))
-                .contentType(MediaType.APPLICATION_JSON))
+                    .content(mapper.writeValueAsString(newUserDTO))
+                    .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseString));
     }
@@ -113,17 +115,19 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                         .value("User " + idString + " deleted"));
+        verify(userService, times(1)).delete(userDTO.id());
     }
 
     @Test
     public void it_should_change_user_password() throws Exception {
-        UserDTO userDTO = SampleDomains.getSampleUserDTO();
-        ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO("some-password");
+        String newPassword = "some-password";
+        ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(newPassword);
 
         mockMvc.perform(post("/user/change-password").with(csrf())
                         .content(mapper.writeValueAsString(changePasswordDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+        verify(userService, times(1)).changeCurrentUserPassword(newPassword);
     }
 
 }

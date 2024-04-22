@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class VotingServiceImpl implements VotingService {
+
     private final VotingRepository votingRepository;
     private final OptionRepository optionRepository;
     private final UserService userService;
