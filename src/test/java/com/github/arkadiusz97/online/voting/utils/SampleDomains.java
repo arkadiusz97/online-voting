@@ -14,9 +14,9 @@ import java.util.List;
 
 public class SampleDomains {
 
-    private static final Long DAY_AS_MILLISECONDS = 1000L * 60L * 60L * 24L;
-    private static final Date NOW = new Date();
-    private static final Long NOW_AS_MILLISECONDS = new Date().getTime();
+    public static final Long DAY_AS_MILLISECONDS = 1000L * 60L * 60L * 24L;
+    public static final Date NOW = new Date();
+    public static final Long NOW_AS_MILLISECONDS = new Date().getTime();
 
     public static User getSampleUser() {
         return new User("some-mail1@domain.eu", "abc123", new Date());

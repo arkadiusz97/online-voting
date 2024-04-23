@@ -125,7 +125,7 @@ public class VotingControllerTest {
 
     @Test
     @WithMockUser(roles = "USER", username = "some-mail1@domain.eu")
-    public void it_get_voting_result() throws Exception {
+    public void it_should_get_voting_result() throws Exception {
         Long id = 1L;
         VotingSummaryDto votingSummaryDto = SampleDomains.getSampleVotingSummaryDto();
         Mockito.when(votingService.getVotingResult(id)).thenReturn(votingSummaryDto);
