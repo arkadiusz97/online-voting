@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.github.arkadiusz97.online.voting.utils.Utils.getDateAheadOfDays;
+
 public class SampleDomains {
 
     public static final Long DAY_AS_MILLISECONDS = 1000L * 60L * 60L * 24L;
@@ -55,38 +57,37 @@ public class SampleDomains {
 
     public static LinkedList<CreateVotingDTO> getSampleVotingDTOs() {
         LinkedList<CreateVotingDTO> sampleVotingDTOs = new LinkedList<>();
-        sampleVotingDTOs.add(//todo refactor new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS)
-                new CreateVotingDTO("some voting", new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS), List.of("opt1, opt2, opt3"))
+        sampleVotingDTOs.add(
+                new CreateVotingDTO("some voting", getDateAheadOfDays(1), List.of("opt1, opt2, opt3"))
         );
         sampleVotingDTOs.add(
-                new CreateVotingDTO("some voting 2", new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS), List.of("opt4, opt5, opt6"))
+                new CreateVotingDTO("some voting 2", getDateAheadOfDays(1), List.of("opt4, opt5, opt6"))
         );
         sampleVotingDTOs.add(
-                new CreateVotingDTO("some voting 3", new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS), List.of("opt7, opt8, opt9"))
+                new CreateVotingDTO("some voting 3", getDateAheadOfDays(1), List.of("opt7, opt8, opt9"))
         );
         return sampleVotingDTOs;
     }
 
     public static VotingWithOptionsDTO getSampleVotingWithOptionsDTO() {
         return new VotingWithOptionsDTO(1L, "voting 1",
-                new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS), NOW, getSampleUserDTO(),
+                getDateAheadOfDays(1), NOW, getSampleUserDTO(),
                 getSampleOptionDTOs("opt1", "opt2", "opt3"));
     }
 
     public static LinkedList<VotingWithOptionsDTO> getSampleVotingWithOptionsDTOs() {
         LinkedList<VotingWithOptionsDTO> sampleVotingWithOptionsDTOs = new LinkedList<>();
         sampleVotingWithOptionsDTOs.add(new VotingWithOptionsDTO(1L, "voting 1",
-                new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS), NOW, getSampleUserDTO(),
+                getDateAheadOfDays(1), NOW, getSampleUserDTO(),
                 getSampleOptionDTOs("opt1", "opt2", "opt3"))
         );
         sampleVotingWithOptionsDTOs.add(new VotingWithOptionsDTO(2L, "voting 2",
-                new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS * 2),
-                new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS),
-                getSampleUserDTO(), getSampleOptionDTOs("opt4", "opt5", "opt6"))
+                getDateAheadOfDays(2), getDateAheadOfDays(1), getSampleUserDTO(),
+                getSampleOptionDTOs("opt4", "opt5", "opt6"))
         );
         sampleVotingWithOptionsDTOs.add(new VotingWithOptionsDTO(3L, "voting 3",
-                new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS * 5),
-                new Date(NOW_AS_MILLISECONDS + DAY_AS_MILLISECONDS * 3),
+                getDateAheadOfDays(5),
+                getDateAheadOfDays(3),
                 getSampleUserDTO(), getSampleOptionDTOs("opt7", "opt8", "opt9"))
         );
         return sampleVotingWithOptionsDTOs;
