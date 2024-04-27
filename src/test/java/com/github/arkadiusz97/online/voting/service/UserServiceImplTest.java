@@ -3,6 +3,7 @@ package com.github.arkadiusz97.online.voting.service;
 import com.github.arkadiusz97.online.voting.domain.Role;
 import com.github.arkadiusz97.online.voting.domain.User;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
+import com.github.arkadiusz97.online.voting.exception.UserAlreadyExistsException;
 import com.github.arkadiusz97.online.voting.repository.RoleRepository;
 import com.github.arkadiusz97.online.voting.repository.UserRepository;
 import com.github.arkadiusz97.online.voting.repository.UserRoleRepository;
@@ -26,8 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,6 +75,15 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void registerNewUserWhenAlreadyExistsTest() {
+        String userMail = "some-user@domain.com";
+        Mockito.when(userRepository.findByEmail(userMail)).thenReturn(SampleDomains.getSampleUser());
+        assertThatExceptionOfType(UserAlreadyExistsException.class).isThrownBy(() ->
+                userServiceImpl.registerNewUser(userMail)
+        );
+    }
+
+    @Test
     public void registerNewAdminTest() {
         Mockito.when(roleRepository.findByName("ROLE_ADMIN")).thenReturn(new Role("ROLE_ADMIN"));
         String userMail = "some-user@domain.com";
@@ -115,6 +124,13 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void deleteUserThrowsExceptionTest() {
+        Long userId = 1L;
+        Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+        assertThatException().isThrownBy(() -> userServiceImpl.delete(1L));
+    }
+
+    @Test
     public void getCurrentUserTest() {
         LinkedList<User> users = SampleDomains.getSampleUsers();
         User user = users.get(0);
@@ -143,6 +159,12 @@ public class UserServiceImplTest {
         String newPassword = "aa00AA--";
         userServiceImpl.changeCurrentUserPassword(newPassword);
         verify(passwordEncoder, times(1)).encode(newPassword);
+    }
+
+    @Test
+    public void changeCurrentUserPasswordThrowsExceptionTest() {
+        String newPassword = "p";
+        assertThatException().isThrownBy(() -> userServiceImpl.changeCurrentUserPassword(newPassword));
     }
 
     @Test

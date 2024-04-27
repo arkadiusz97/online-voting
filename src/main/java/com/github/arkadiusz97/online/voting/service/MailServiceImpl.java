@@ -1,6 +1,5 @@
 package com.github.arkadiusz97.online.voting.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

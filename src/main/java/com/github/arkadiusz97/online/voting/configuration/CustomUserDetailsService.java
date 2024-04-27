@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -28,11 +29,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     @Override
     public UserDetails loadUserByUsername(final String email) {
-        User user = userRepository.findByEmail(email);
-        List<User> users = userRepository.findAll();
-        if (user == null) {
+        Optional<User> userOptional = Optional.ofNullable(userRepository.findByEmail(email));
+        if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException(email);
         }
+        User user = userOptional.get();
         return new org.springframework.security.core.userdetails.User(
             user.getEmail(), user.getPassword(), true, true, true,
             true, getAuthorities(user.getUsersRoles()));

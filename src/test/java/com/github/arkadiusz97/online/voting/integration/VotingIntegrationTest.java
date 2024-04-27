@@ -55,7 +55,6 @@ public class VotingIntegrationTest {
     @Value("${online-voting.default-admin-password}")
     private String defaultAdminPassword;
 
-
     private ObjectMapper mapper = new ObjectMapper();
 
     @Test
@@ -116,10 +115,14 @@ public class VotingIntegrationTest {
                         .value(optionsForFirstVoting.get(0).getDescription()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.optionResults[0].numberOfChoices")
                         .value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.optionResults[0].percentageOfChoices")
+                        .value(66.67))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.optionResults[1].optionDescription")
                         .value(optionsForFirstVoting.get(1).getDescription()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.optionResults[1].numberOfChoices")
                         .value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.optionResults[1].percentageOfChoices")
+                        .value(33))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.winningOptions[0]")
                         .value(optionsForFirstVoting.get(0).getDescription()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.winningOptions[1]")

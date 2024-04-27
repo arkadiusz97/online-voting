@@ -7,10 +7,12 @@ import com.github.arkadiusz97.online.voting.domain.Voting;
 import com.github.arkadiusz97.online.voting.dto.requestbody.CreateVotingDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingSummaryDto;
 import com.github.arkadiusz97.online.voting.dto.responsebody.VotingWithOptionsDTO;
+import com.github.arkadiusz97.online.voting.exception.*;
 import com.github.arkadiusz97.online.voting.repository.OptionRepository;
 import com.github.arkadiusz97.online.voting.repository.UserOptionRepository;
 import com.github.arkadiusz97.online.voting.repository.VotingRepository;
 import com.github.arkadiusz97.online.voting.utils.SampleDomains;
+import com.github.arkadiusz97.online.voting.utils.Utils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +25,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,8 +50,7 @@ public class VotingServiceImplTest {
 
     @Test
     public void createTest() {
-        Date now = new Date();
-        Date tomorrow = new Date(now.getTime() + (1000 * 60 * 60 * 24));
+        Date tomorrow = Utils.getDateAheadOfDays(1);
 
         CreateVotingDTO createVotingDTO = new CreateVotingDTO(
             "sample voting", tomorrow, List.of("opt1", "opt2", "opt3"));
@@ -58,6 +59,19 @@ public class VotingServiceImplTest {
         List<Voting> votings = votingRepository.findAll();
         verify(votingRepository, times(1)).save(any());
         verify(optionRepository, times(3)).save(any());
+    }
+
+    @Test
+    public void createWhenEndDateIsBehindTodayTest() {
+        Date yesterday = Utils.getDateAheadOfDays(-1);
+        CreateVotingDTO createVotingDTO = new CreateVotingDTO(
+                "sample voting", yesterday, List.of("opt1", "opt2", "opt3"));
+
+        assertThatExceptionOfType(VotingEndDateIsBehindTodayException.class).isThrownBy(() ->
+                votingServiceImpl.create(createVotingDTO)
+        );
+        verify(votingRepository, times(0)).save(any());
+        verify(optionRepository, times(0)).save(any());
     }
 
     @Test
@@ -99,6 +113,50 @@ public class VotingServiceImplTest {
         verify(userService).getCurrentUser();
         verify(optionRepository).findById(1L);
         verify(userOptionRepository).save(any(UserOption.class));
+    }
+
+    @Test
+    public void voteWhenUserAlreadyVotedTest() {
+        Long optionId = 1L;
+        User user = SampleDomains.getSampleUser();
+        LinkedList<Voting> votings = SampleDomains.getSampleVotings(user);
+        LinkedList<Option> options = SampleDomains.getSampleOptions(votings.get(0));
+        Option selectedOption = options.get(0);
+        Mockito.when(optionRepository.findById(optionId)).thenReturn(Optional.of(selectedOption));
+        Mockito.when(userOptionRepository.findAllByUser(user)).thenReturn(
+                Collections.singletonList(new UserOption(user, selectedOption))
+        );
+        Mockito.when(userService.getCurrentUser()).thenReturn(user);
+
+        assertThatExceptionOfType(UserAlreadyVotedException.class).isThrownBy(() -> votingServiceImpl.vote(optionId));
+        verify(userService).getCurrentUser();
+        verify(optionRepository).findById(1L);
+    }
+
+    @Test
+    public void voteWhenVotingIsExpiredTest() {
+        Long optionId = 1L;
+        User user = SampleDomains.getSampleUser();
+        LinkedList<Voting> votings = SampleDomains.getSampleVotings(user);
+        Voting selectedVoting = votings.get(0);
+        selectedVoting.setEndDate(Utils.getDateAheadOfDays(-1));
+        LinkedList<Option> options = SampleDomains.getSampleOptions(selectedVoting);
+        Mockito.when(optionRepository.findById(optionId)).thenReturn(Optional.of(options.get(0)));
+        Mockito.when(userService.getCurrentUser()).thenReturn(user);
+
+        assertThatExceptionOfType(VotingIsExpiredException.class).isThrownBy(() -> votingServiceImpl.vote(optionId));
+        verify(userService).getCurrentUser();
+        verify(optionRepository).findById(1L);
+    }
+
+    @Test
+    public void voteTestWhenSelectedOptionDoesntExists() {
+        Long optionId = 1L;
+        User user = SampleDomains.getSampleUser();
+        Mockito.when(optionRepository.findById(optionId)).thenReturn(Optional.empty());
+        Mockito.when(userService.getCurrentUser()).thenReturn(user);
+        assertThatExceptionOfType(OptionNotFoundException.class).isThrownBy(() -> votingServiceImpl.vote(optionId));
+        verify(userService).getCurrentUser();
     }
 
     @Test
