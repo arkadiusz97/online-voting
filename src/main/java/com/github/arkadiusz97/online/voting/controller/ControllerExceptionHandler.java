@@ -30,7 +30,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(OptionNotFoundException.class)
     public ResponseEntity<GenericResponseDTO> handleOptionNotFoundException() {
         GenericResponseDTO response = new GenericResponseDTO("Option not found");
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)

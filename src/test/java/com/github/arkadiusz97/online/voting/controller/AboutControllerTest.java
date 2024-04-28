@@ -40,4 +40,15 @@ public class AboutControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.startedAt").value(Utils.getFormattedDate(date)));
     }
 
+    @Test
+    public void it_should_not_return_about_page_when_exception_is_thrown() throws Exception {
+        String errorMessage = "error message";
+        Mockito.doThrow(new RuntimeException(errorMessage)).when(aboutService).getAbout();
+
+        mockMvc.perform(get("/about"))
+                .andExpect(status().is5xxServerError())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                        .value("Internal server error: " + errorMessage));
+    }
+
 }

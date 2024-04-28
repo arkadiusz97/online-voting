@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.arkadiusz97.online.voting.dto.requestbody.ChangePasswordDTO;
 import com.github.arkadiusz97.online.voting.dto.requestbody.NewUserDTO;
 import com.github.arkadiusz97.online.voting.dto.responsebody.UserDTO;
+import com.github.arkadiusz97.online.voting.exception.NotSecurePasswordException;
+import com.github.arkadiusz97.online.voting.exception.ResourceNotFoundException;
+import com.github.arkadiusz97.online.voting.exception.UserAlreadyExistsException;
 import com.github.arkadiusz97.online.voting.service.UserService;
 import com.github.arkadiusz97.online.voting.utils.SampleDomains;
 import com.github.arkadiusz97.online.voting.utils.Utils;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -51,6 +55,18 @@ public class UserControllerTest {
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(responseString));
+    }
+
+    @Test
+    public void it_should_bot_register_new_user_when_exists() throws Exception {
+        String email = "some-email@domain.com";
+        NewUserDTO newUserDTO = new NewUserDTO(email);
+        Mockito.doThrow(new UserAlreadyExistsException()).when(userService).registerNewUser(newUserDTO.recipient());
+        mockMvc.perform(post("/user/register").with(csrf())
+                        .content(mapper.writeValueAsString(newUserDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("User already exists"));
     }
 
     @Test
@@ -119,6 +135,20 @@ public class UserControllerTest {
     }
 
     @Test
+    public void it_should_not_delete_user_when_dosent_exist() throws Exception {
+        UserDTO userDTO = SampleDomains.getSampleUserDTO();
+
+        String idString = userDTO.id().toString();
+        String url = "/user/delete/" + idString;
+        Mockito.doThrow(new ResourceNotFoundException()).when(userService).delete(userDTO.id());
+
+        mockMvc.perform(delete(url).with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                        .value("Resource not found"));
+    }
+
+    @Test
     public void it_should_change_user_password() throws Exception {
         String newPassword = "some-password";
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(newPassword);
@@ -128,6 +158,23 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
         verify(userService, times(1)).changeCurrentUserPassword(newPassword);
+    }
+
+    @Test
+    public void it_should_not_change_user_password_when_its_not_secure() throws Exception {
+        String newPassword = "some-password";
+        ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(newPassword);
+        Mockito.doThrow(new NotSecurePasswordException()).when(userService)
+                .changeCurrentUserPassword(changePasswordDTO.newPassword());
+        String errorMessage = "Password doesn't meet security requirements. Please use at least 8 characters, " +
+                "at least one digit, at least one one lower-case letter and at least one upper-case letter.";
+
+        mockMvc.perform(post("/user/change-password").with(csrf())
+                        .content(mapper.writeValueAsString(changePasswordDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                        .value(errorMessage));
     }
 
 }
