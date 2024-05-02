@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @PostMapping("change-password")
-    public ResponseEntity<Void> registerNew(@RequestBody ChangePasswordDTO dto) {
+    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordDTO dto) {
         userService.changeCurrentUserPassword(dto.newPassword());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

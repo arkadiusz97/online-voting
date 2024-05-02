@@ -51,6 +51,11 @@ public class SampleDomains {
         return sampleVotings;
     }
 
+    public static Voting getSampleVoting(User user) {
+        Date tomorrow = new Date(NOW.getTime() + (1000 * 60 * 60 * 24));
+        return new Voting(0L, "voting 1", tomorrow, NOW, user);
+    }
+
     public static CreateVotingDTO getSampleVotingDTO() {
         return new CreateVotingDTO("some voting", NOW, List.of("opt1, opt2, opt3"));
     }

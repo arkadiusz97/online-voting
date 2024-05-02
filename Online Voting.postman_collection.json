@@ -1,7 +1,8 @@
 {
 	"info": {
-		"_postman_id": "46dbd54f-c407-406e-935b-8f6502bfacec",
+		"_postman_id": "b0d19b2d-ef84-4ea6-9521-81ecafbbfaf7",
 		"name": "Online Voting",
+		"description": "Collection for whole Online Voting app.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "31692989"
 	},
@@ -49,7 +50,8 @@
 								"user",
 								"register"
 							]
-						}
+						},
+						"description": "It registers a new user with given e-mail address as \"recipient\" field."
 					},
 					"response": []
 				},
@@ -93,7 +95,8 @@
 								"user",
 								"change-password"
 							]
-						}
+						},
+						"description": "It changes password for authenticated user."
 					},
 					"response": []
 				},
@@ -138,7 +141,8 @@
 									"value": "5"
 								}
 							]
-						}
+						},
+						"description": "It gets list of users with informations about them using pagination. Page numbers starts from 0. For example, if pageNumber is 1 and pageSize is 3, the 4th, 5th and 6th users will be returned."
 					},
 					"response": []
 				},
@@ -174,7 +178,8 @@
 								"get",
 								"1"
 							]
-						}
+						},
+						"description": "It gets informations about user with given id."
 					},
 					"response": []
 				},
@@ -209,7 +214,8 @@
 								"user",
 								"get-current"
 							]
-						}
+						},
+						"description": "It gets informations about authenticated user."
 					},
 					"response": []
 				},
@@ -245,11 +251,13 @@
 								"delete",
 								"2"
 							]
-						}
+						},
+						"description": "It deletes user with given id."
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Operations related with user."
 		},
 		{
 			"name": "voting",
@@ -274,15 +282,6 @@
 						},
 						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"description\": \"some voting\",\r\n    \"options\": [\r\n        \"first option\",\r\n        \"another...\",\r\n        \"3 opt\"\r\n    ]\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "http://localhost:8080/voting/delete/1",
 							"protocol": "http",
@@ -295,7 +294,8 @@
 								"delete",
 								"1"
 							]
-						}
+						},
+						"description": "It deletes voting with given id."
 					},
 					"response": []
 				},
@@ -339,7 +339,8 @@
 								"voting",
 								"vote"
 							]
-						}
+						},
+						"description": "It votes on option in voting with given id. Every selected option has to be related with some voting."
 					},
 					"response": []
 				},
@@ -375,7 +376,8 @@
 								"get",
 								"1"
 							]
-						}
+						},
+						"description": "It gets voting with given id."
 					},
 					"response": []
 				},
@@ -420,7 +422,8 @@
 									"value": "5"
 								}
 							]
-						}
+						},
+						"description": "It gets list of votings using pagination. Page numbers starts from 0. For example, if pageNumber is 1 and pageSize is 3, the 4th, 5th and 6th votings will be returned."
 					},
 					"response": []
 				},
@@ -456,7 +459,8 @@
 								"result",
 								"1"
 							]
-						}
+						},
+						"description": "It gets voting result with given id. Voting result contains basic informations about voting: description, total given votes and if voting is finished - if yes, users cannot vote.\n\nIf option is seleted at least once, it is listed with informations how many it was selected and with it's percentage of choices.\n\nIf multiple options have the same amount of votes and if they are winning, they are shown in \"winningOptions\". Then it's a tied vote."
 					},
 					"response": []
 				},
@@ -500,11 +504,13 @@
 								"voting",
 								"create"
 							]
-						}
+						},
+						"description": "It creates voting with given description, options to choose and endDate. When current date is after endDate, no user can vote - it means that voting is finished."
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Operations related with votings."
 		},
 		{
 			"name": "about",
@@ -539,11 +545,13 @@
 							"path": [
 								"about"
 							]
-						}
+						},
+						"description": "It gets basic informations about application."
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Operations related with about page."
 		}
 	]
 }
