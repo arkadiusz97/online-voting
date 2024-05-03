@@ -28,9 +28,11 @@ public class InitialDatabase {
 
     @PostConstruct
     public void init() {
-        roleRepository.save(new Role("ROLE_USER"));
-        roleRepository.save(new Role("ROLE_ADMIN"));
-        userService.registerNew(defaultAdminLogin, "ROLE_ADMIN", defaultAdminPassword);
+        if(roleRepository.findAll().isEmpty()) {
+            roleRepository.save(new Role("ROLE_USER"));
+            roleRepository.save(new Role("ROLE_ADMIN"));
+            userService.registerNew(defaultAdminLogin, "ROLE_ADMIN", defaultAdminPassword);
+        }
     }
 
 }

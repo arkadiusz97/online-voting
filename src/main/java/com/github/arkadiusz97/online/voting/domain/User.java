@@ -4,17 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Date;
 import java.util.Set;
 
 @Entity(name="online_voting_user")
 @NoArgsConstructor
-@AllArgsConstructor
-@ToString
 @Getter
 @Setter
 public class User {

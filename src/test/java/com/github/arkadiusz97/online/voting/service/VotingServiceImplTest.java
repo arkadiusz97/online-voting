@@ -56,7 +56,6 @@ public class VotingServiceImplTest {
             "sample voting", tomorrow, List.of("opt1", "opt2", "opt3"));
         votingServiceImpl.create(createVotingDTO);
 
-        List<Voting> votings = votingRepository.findAll();
         verify(votingRepository, times(1)).save(any());
         verify(optionRepository, times(3)).save(any());
     }
@@ -183,6 +182,22 @@ public class VotingServiceImplTest {
         assertThat(result.optionResults().get(1).numberOfChoices()).isEqualTo(1);
         assertThat(result.winningOptions().size()).isEqualTo(1);
         assertThat(result.winningOptions().get(0)).isEqualTo("opt1");
+    }
+
+    @Test
+    public void getVotingResultTestWhenThereAreNoSelectedOptions() {
+        Long votingId = 2L;
+        LinkedList<User> user = SampleDomains.getSampleUsers();
+        LinkedList<Voting> votings = SampleDomains.getSampleVotings(user.get(0));
+        Voting selectedVoting = votings.get(0);
+        Mockito.when(votingRepository.findById(votingId)).thenReturn(Optional.of(selectedVoting));
+        Mockito.when(userOptionRepository.findAll()).thenReturn(Collections.emptyList());
+
+        VotingSummaryDto result = votingServiceImpl.getVotingResult(votingId);
+        assertThat(result.votingDescription()).isEqualTo("voting 1");
+        assertThat(result.totalVotes()).isEqualTo(0);
+        assertThat(result.optionResults().size()).isEqualTo(0);
+        assertThat(result.winningOptions().size()).isEqualTo(0);
     }
 
     @Test

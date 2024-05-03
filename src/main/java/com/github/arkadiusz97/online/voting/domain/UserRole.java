@@ -15,9 +15,7 @@ import lombok.ToString;
 @Entity(name="online_voting_user_role")
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Getter
-@Setter
 @Embeddable
 public class UserRole {
 

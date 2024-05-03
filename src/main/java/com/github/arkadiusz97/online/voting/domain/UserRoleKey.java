@@ -14,9 +14,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Embeddable
-@ToString
 public class UserRoleKey implements Serializable {
 
     @Column(name = "user_id")
