@@ -16,13 +16,13 @@ import java.util.List;
 
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 @RestController
-@RequestMapping("user")
+@RequestMapping("users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("register")
+    @PostMapping
     public ResponseEntity<GenericResponseDTO> registerNew(@RequestBody NewUserDTO dto) {
         GenericResponseDTO result = new GenericResponseDTO(
             userService.registerNewUser(dto.recipient())
@@ -30,34 +30,34 @@ public class UserController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @GetMapping("get")
+    @GetMapping
     public ResponseEntity<List<UserDTO>> showMany(@RequestParam String pageNumber, @RequestParam String pageSize) {
         List<UserDTO> result = userService.showMany(Integer.valueOf(pageNumber), Integer.valueOf(pageSize));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("get-current")
+    @GetMapping("current")
     public ResponseEntity<UserDTO> showCurrentUser(Principal principal) {
         String userEmail = principal.getName();
         UserDTO result = userService.getByEmail(userEmail);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("get/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<UserDTO> show(@PathVariable String id) {
         UserDTO result = userService.getById(Long.valueOf(id));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<GenericResponseDTO> delete(@PathVariable String id) {
         userService.delete(Long.valueOf(id));
         GenericResponseDTO result = new GenericResponseDTO("User " + id + " deleted");
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("change-password")
+    @PostMapping("current/password")
     public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordDTO dto) {
         userService.changeCurrentUserPassword(dto.newPassword());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

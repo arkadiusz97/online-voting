@@ -45,7 +45,7 @@ public class VotingControllerTest {
     public void it_should_create_voting() throws Exception {
         CreateVotingDTO createVotingDTO = SampleDomains.getSampleVotingDTO();
         Mockito.doNothing().when(votingService).create(createVotingDTO);
-        mockMvc.perform(post("/voting/create").with(csrf())
+        mockMvc.perform(post("/votings").with(csrf())
                     .content(mapper.writeValueAsString(createVotingDTO))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -59,7 +59,7 @@ public class VotingControllerTest {
     public void it_should_not_create_voting_when_voting_end_date_is_behind_today() throws Exception {
         CreateVotingDTO createVotingDTO = SampleDomains.getSampleVotingDTO();
         Mockito.doThrow(new VotingEndDateIsBehindTodayException()).when(votingService).create(createVotingDTO);
-        mockMvc.perform(post("/voting/create").with(csrf())
+        mockMvc.perform(post("/votings").with(csrf())
                         .content(mapper.writeValueAsString(createVotingDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
@@ -74,7 +74,7 @@ public class VotingControllerTest {
         Integer pageNumber = 1;
         Integer pageSize = 3;
         Mockito.when(votingService.showMany(pageNumber, pageSize)).thenReturn(votingsWithOptionsDTO);
-        String url = "/voting/get?pageNumber=" + pageNumber.toString() + "&pageSize=" + pageSize.toString();
+        String url = "/votings?pageNumber=" + pageNumber.toString() + "&pageSize=" + pageSize.toString();
         mockMvc.perform(get(url).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[1].id")
@@ -97,7 +97,7 @@ public class VotingControllerTest {
         VotingWithOptionsDTO votingWithOptionsDTO = SampleDomains.getSampleVotingWithOptionsDTO();
         Long id = 1L;
         Mockito.when(votingService.get(id)).thenReturn(votingWithOptionsDTO);
-        String url = "/voting/get/" + id.toString();
+        String url = "/votings/" + id.toString();
         mockMvc.perform(get(url).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id")
@@ -120,7 +120,7 @@ public class VotingControllerTest {
         VotingWithOptionsDTO votingWithOptionsDTO = SampleDomains.getSampleVotingWithOptionsDTO();
         Long id = 1L;
         Mockito.doThrow(new ResourceNotFoundException()).when(votingService).get(votingWithOptionsDTO.id());
-        String url = "/voting/get/" + id.toString();
+        String url = "/votings/" + id.toString();
         mockMvc.perform(get(url).with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -131,7 +131,7 @@ public class VotingControllerTest {
     @WithMockUser(roles = "ADMIN", username = "some-mail1@domain.eu")
     public void it_should_delete_voting() throws Exception {
         Long id = 1L;
-        String url = "/voting/delete/" + id.toString();
+        String url = "/votings/" + id.toString();
         mockMvc.perform(delete(url).with(csrf()))
                 .andExpect(status().isOk());
         verify(votingService, times(1)).delete(id);
@@ -141,7 +141,7 @@ public class VotingControllerTest {
     @WithMockUser(roles = "ADMIN", username = "some-mail1@domain.eu")
     public void it_should_delete_voting_when_doesnt_exist() throws Exception {
         Long id = 1L;
-        String url = "/voting/delete/" + id.toString();
+        String url = "/votings/" + id.toString();
         Mockito.doThrow(new ResourceNotFoundException()).when(votingService).delete(id);
         mockMvc.perform(delete(url).with(csrf()))
                 .andExpect(status().isNotFound())
@@ -153,7 +153,7 @@ public class VotingControllerTest {
     @WithMockUser(roles = "USER", username = "some-mail1@domain.eu")
     public void it_should_vote() throws Exception {
         Long id = 1L;
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                     .content(mapper.writeValueAsString(new VoteDTO(id)))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -167,7 +167,7 @@ public class VotingControllerTest {
     public void it_should_not_vote_when_option_not_found() throws Exception {
         Long id = 1L;
         Mockito.doThrow(new OptionNotFoundException()).when(votingService).vote(id);
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .content(mapper.writeValueAsString(new VoteDTO(id)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -180,7 +180,7 @@ public class VotingControllerTest {
     public void it_should_not_vote_when_voting_is_expired() throws Exception {
         Long id = 1L;
         Mockito.doThrow(new VotingIsExpiredException()).when(votingService).vote(id);
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .content(mapper.writeValueAsString(new VoteDTO(id)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
@@ -193,7 +193,7 @@ public class VotingControllerTest {
     public void it_should_not_vote_when_user_already_voted() throws Exception {
         Long id = 1L;
         Mockito.doThrow(new UserAlreadyVotedException()).when(votingService).vote(id);
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .content(mapper.writeValueAsString(new VoteDTO(id)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
@@ -207,7 +207,7 @@ public class VotingControllerTest {
         Long id = 1L;
         VotingSummaryDto votingSummaryDto = SampleDomains.getSampleVotingSummaryDto();
         Mockito.when(votingService.getVotingResult(id)).thenReturn(votingSummaryDto);
-        String url = "/voting/result/" + id.toString();
+        String url = "/votings/" + id.toString() + "/result";
         mockMvc.perform(get(url).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.votingDescription")

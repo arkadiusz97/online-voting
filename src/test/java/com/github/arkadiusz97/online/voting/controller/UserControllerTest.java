@@ -50,7 +50,7 @@ public class UserControllerTest {
         String responseString = "Created a new user " + email;
         Mockito.when(userService.registerNewUser(newUserDTO.recipient())).thenReturn(responseString);
 
-        mockMvc.perform(post("/user/register").with(csrf())
+        mockMvc.perform(post("/users").with(csrf())
                     .content(mapper.writeValueAsString(newUserDTO))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -62,7 +62,7 @@ public class UserControllerTest {
         String email = "some-email@domain.com";
         NewUserDTO newUserDTO = new NewUserDTO(email);
         Mockito.doThrow(new UserAlreadyExistsException()).when(userService).registerNewUser(newUserDTO.recipient());
-        mockMvc.perform(post("/user/register").with(csrf())
+        mockMvc.perform(post("/users").with(csrf())
                         .content(mapper.writeValueAsString(newUserDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
@@ -77,7 +77,7 @@ public class UserControllerTest {
         Mockito.when(userService.showMany(pageNumber, pageSize)).
                 thenReturn(Collections.singletonList(userDTO));
 
-        String url = "/user/get?pageNumber=" + pageNumber.toString() + "&pageSize=" + pageSize.toString();
+        String url = "/users?pageNumber=" + pageNumber.toString() + "&pageSize=" + pageSize.toString();
         mockMvc.perform(get(url).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(userDTO.id()))
@@ -94,7 +94,7 @@ public class UserControllerTest {
         Mockito.when(userService.getByEmail(userDTO.email())).
                 thenReturn(userDTO);
 
-        mockMvc.perform(get("/user/get-current").with(csrf()))
+        mockMvc.perform(get("/users/current").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(userDTO.id()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].name")
@@ -110,7 +110,7 @@ public class UserControllerTest {
         Mockito.when(userService.getById(userDTO.id())).
                 thenReturn(userDTO);
 
-        String url = "/user/get/" + userDTO.id().toString();
+        String url = "/users/" + userDTO.id().toString();
         mockMvc.perform(get(url).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(userDTO.id()))
@@ -126,7 +126,7 @@ public class UserControllerTest {
         UserDTO userDTO = SampleDomains.getSampleUserDTO();
 
         String idString = userDTO.id().toString();
-        String url = "/user/delete/" + idString;
+        String url = "/users/" + idString;
         mockMvc.perform(delete(url).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -139,7 +139,7 @@ public class UserControllerTest {
         UserDTO userDTO = SampleDomains.getSampleUserDTO();
 
         String idString = userDTO.id().toString();
-        String url = "/user/delete/" + idString;
+        String url = "/users/" + idString;
         Mockito.doThrow(new ResourceNotFoundException()).when(userService).delete(userDTO.id());
 
         mockMvc.perform(delete(url).with(csrf()))
@@ -153,7 +153,7 @@ public class UserControllerTest {
         String newPassword = "some-password";
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(newPassword);
 
-        mockMvc.perform(post("/user/change-password").with(csrf())
+        mockMvc.perform(post("/users/current/password").with(csrf())
                         .content(mapper.writeValueAsString(changePasswordDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -169,7 +169,7 @@ public class UserControllerTest {
         String errorMessage = "Password doesn't meet security requirements. Please use at least 8 characters, " +
                 "at least one digit, at least one one lower-case letter and at least one upper-case letter.";
 
-        mockMvc.perform(post("/user/change-password").with(csrf())
+        mockMvc.perform(post("/users/current/password").with(csrf())
                         .content(mapper.writeValueAsString(changePasswordDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())

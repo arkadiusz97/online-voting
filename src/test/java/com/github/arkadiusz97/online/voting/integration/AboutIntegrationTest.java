@@ -40,7 +40,7 @@ public class AboutIntegrationTest {
     @Test
     public void it_should_return_about_page() throws Exception {
         var adminUserRequest = user(defaultAdminLogin).password(defaultAdminPassword).roles("ADMIN");
-        mockMvc.perform(get("/about").with(csrf()).with(adminUserRequest))
+        mockMvc.perform(get("/app-details").with(csrf()).with(adminUserRequest))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.version").value(appVersion))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.startedAt").exists());

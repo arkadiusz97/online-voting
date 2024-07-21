@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("about")
+@RequestMapping("app-details")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 @RequiredArgsConstructor
 public class AboutController {
 
     private final AboutService aboutService;
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<AboutDTO> about() {
         AboutDTO about = aboutService.getAbout();
         return new ResponseEntity<>(about, HttpStatusCode.valueOf(200));

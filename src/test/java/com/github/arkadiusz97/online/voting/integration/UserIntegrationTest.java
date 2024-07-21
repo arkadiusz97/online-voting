@@ -70,7 +70,7 @@ public class UserIntegrationTest {
         String email = "some-email@domain.com";
         NewUserDTO newUserDTO = new NewUserDTO(email);
 
-        mockMvc.perform(post("/user/register").with(csrf())
+        mockMvc.perform(post("/users").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(newUserDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -82,7 +82,7 @@ public class UserIntegrationTest {
         assertThat(users.size()).isEqualTo(2);
         assertThat(users.get(1).getEmail()).isEqualTo("some-email@domain.com");
 
-        mockMvc.perform(post("/user/register").with(csrf())
+        mockMvc.perform(post("/users").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(newUserDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -105,7 +105,7 @@ public class UserIntegrationTest {
         UserRoleKey urk = new UserRoleKey(newUser.getId(), role.getId());
         userRoleRepository.save(new UserRole(urk, newUser, role));
 
-        String url = "/user/get?pageNumber=0&pageSize=5";
+        String url = "/users?pageNumber=0&pageSize=5";
         mockMvc.perform(get(url).with(csrf()).with(adminUserRequest))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(adminUser.getId()))
@@ -134,7 +134,7 @@ public class UserIntegrationTest {
         UserRoleKey urk = new UserRoleKey(newUser.getId(), role.getId());
         userRoleRepository.save(new UserRole(urk, newUser, role));
 
-        String url = "/user/get/" + newUser.getId().toString();
+        String url = "/users/" + newUser.getId().toString();
         mockMvc.perform(get(url).with(csrf()).with(adminUserRequest))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(newUser.getId()))
@@ -150,7 +150,7 @@ public class UserIntegrationTest {
         var adminUserRequest = user(defaultAdminLogin).password(defaultAdminPassword).roles("ADMIN");
         assertThat(userRepository.findAll().size()).isEqualTo(1);
 
-        mockMvc.perform(get("/user/get/2").with(csrf()).with(adminUserRequest))
+        mockMvc.perform(get("/users/2").with(csrf()).with(adminUserRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                         .value("Resource not found"));
@@ -163,7 +163,7 @@ public class UserIntegrationTest {
         assertThat(userRepository.findAll().size()).isEqualTo(1);
         User adminUser = userRepository.findAll().get(0);
 
-        String url = "/user/get-current";
+        String url = "/users/current";
         mockMvc.perform(get(url).with(csrf()).with(adminUserRequest))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(adminUser.getId()))
@@ -185,7 +185,7 @@ public class UserIntegrationTest {
         userRoleRepository.save(new UserRole(urk, newUser, role));
 
         String idString = newUser.getId().toString();
-        String url = "/user/delete/" + idString;
+        String url = "/users/" + idString;
         mockMvc.perform(delete(url).with(csrf()).with(adminUserRequest))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -199,7 +199,7 @@ public class UserIntegrationTest {
         var adminUserRequest = user(defaultAdminLogin).password(defaultAdminPassword).roles("ADMIN");
         assertThat(userRepository.findAll().size()).isEqualTo(1);
 
-        mockMvc.perform(delete("/user/delete/2").with(csrf()).with(adminUserRequest))
+        mockMvc.perform(delete("/users/2").with(csrf()).with(adminUserRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                         .value("Resource not found"));
@@ -215,7 +215,7 @@ public class UserIntegrationTest {
         String oldPassword = users.get(0).getPassword();
 
         ChangePasswordDTO changePasswordToNotSecureDTO = new ChangePasswordDTO("a");
-        mockMvc.perform(post("/user/change-password").with(csrf())
+        mockMvc.perform(post("/users/current/password").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(changePasswordToNotSecureDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -223,7 +223,7 @@ public class UserIntegrationTest {
         assertThat(userRepository.findAll().getFirst().getPassword()).isEqualTo(oldPassword);
 
         ChangePasswordDTO changePasswordToSecureDTO = new ChangePasswordDTO("AAaa11--");
-        mockMvc.perform(post("/user/change-password").with(csrf())
+        mockMvc.perform(post("/users/current/password").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(changePasswordToSecureDTO))
                         .contentType(MediaType.APPLICATION_JSON))

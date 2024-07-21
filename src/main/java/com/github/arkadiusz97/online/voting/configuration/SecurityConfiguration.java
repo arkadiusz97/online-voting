@@ -1,6 +1,7 @@
 package com.github.arkadiusz97.online.voting.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -14,6 +15,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -21,6 +27,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
     private final CustomUserDetailsService customUserDetailsService;
+
+    @Value("${online-voting.allowed-origins-pattern}")
+    private String allowedOriginsPattern;
 
     @Autowired
     public SecurityConfiguration(CustomUserDetailsService customUserDetailsService) {
@@ -43,6 +52,13 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .cors(cors -> cors.configurationSource(request -> {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOrigins(Arrays.asList(allowedOriginsPattern));
+                configuration.setAllowedMethods(Arrays.asList("*"));
+                configuration.setAllowedHeaders(Arrays.asList("*"));
+                return configuration;
+            }))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests( authorize -> {
                 authorize.anyRequest().authenticated();
@@ -58,6 +74,17 @@ public class SecurityConfiguration {
         String hierarchy = "ROLE_ADMIN > ROLE_USER";
         roleHierarchy.setHierarchy(hierarchy);
         return roleHierarchy;
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Requestor-Type","Content-Type"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }

@@ -73,7 +73,7 @@ public class VotingIntegrationTest {
 
         CreateVotingDTO createVotingDTO = new CreateVotingDTO("sample voting",
                 Utils.getDateAheadOfDays(1), List.of("o1", "o2", "o3"));
-        mockMvc.perform(post("/voting/create").with(csrf())
+        mockMvc.perform(post("/votings").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(createVotingDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -108,7 +108,7 @@ public class VotingIntegrationTest {
             optionRepository.save(option);
         });
 
-        mockMvc.perform(get("/voting/get?pageNumber=0&pageSize=5").with(csrf())
+        mockMvc.perform(get("/votings?pageNumber=0&pageSize=5").with(csrf())
                         .with(adminUserRequest))
                 .andExpect(status().isOk())
 
@@ -182,7 +182,7 @@ public class VotingIntegrationTest {
             optionRepository.save(option);
         });
 
-        mockMvc.perform(get("/voting/get/" + voting.getId().toString()).with(csrf())
+        mockMvc.perform(get("/votings/" + voting.getId().toString()).with(csrf())
                         .with(adminUserRequest))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id")
@@ -215,7 +215,7 @@ public class VotingIntegrationTest {
         var adminUserRequest = user(defaultAdminLogin).password(defaultAdminPassword).roles("ADMIN");
         assertThat(votingRepository.findAll().size()).isEqualTo(0);
 
-        mockMvc.perform(get("/voting/get/1")
+        mockMvc.perform(get("/votings/1")
                         .with(adminUserRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -231,7 +231,7 @@ public class VotingIntegrationTest {
         assertThat(votingRepository.findAll().size()).isEqualTo(1);
 
         String votingIdString = voting.getId().toString();
-        mockMvc.perform(delete("/voting/delete/" + votingIdString).with(csrf())
+        mockMvc.perform(delete("/votings/" + votingIdString).with(csrf())
                         .with(adminUserRequest))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -246,7 +246,7 @@ public class VotingIntegrationTest {
         var adminUserRequest = user(defaultAdminLogin).password(defaultAdminPassword).roles("ADMIN");
         assertThat(votingRepository.findAll().size()).isEqualTo(0);
 
-        mockMvc.perform(delete("/voting/delete/1").with(csrf())
+        mockMvc.perform(delete("/votings/1").with(csrf())
                         .with(adminUserRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -271,7 +271,7 @@ public class VotingIntegrationTest {
 
         assertThat(userOptionRepository.findAll().size()).isEqualTo(0);
 
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(voteDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -286,7 +286,7 @@ public class VotingIntegrationTest {
         assertThat(foundChosenOption.getId()).isEqualTo(chosenOption.getId());
         assertThat(foundChosenOption.getVoting().getId()).isEqualTo(chosenOption.getVoting().getId());
 
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(voteDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -305,7 +305,7 @@ public class VotingIntegrationTest {
         VoteDTO voteDTO = new VoteDTO(1L);
 
 
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(voteDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -337,7 +337,7 @@ public class VotingIntegrationTest {
 
         assertThat(userOptionRepository.findAll().size()).isEqualTo(0);
 
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(voteDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -357,7 +357,7 @@ public class VotingIntegrationTest {
 
         CreateVotingDTO createVotingDTO = new CreateVotingDTO("sample voting",
                 Utils.getDateAheadOfDays(1), List.of("o1", "o2", "o3"));
-        mockMvc.perform(post("/voting/create").with(csrf())
+        mockMvc.perform(post("/votings").with(csrf())
                         .with(adminUserRequest)
                         .content(mapper.writeValueAsString(createVotingDTO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -378,26 +378,26 @@ public class VotingIntegrationTest {
         assertThat(optionRepository.findAll().size()).isEqualTo(3);
         List<Option> optionsForFirstVoting = optionRepository.findAllByVoting(firstVoting);
 
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .with(user(users.get(0).getEmail()).password(users.get(0).getPassword()).roles("USER"))
                         .content(mapper.writeValueAsString(new VoteDTO(optionsForFirstVoting.get(0).getId())))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .with(user(users.get(1).getEmail()).password(users.get(1).getPassword()).roles("USER"))
                         .content(mapper.writeValueAsString(new VoteDTO(optionsForFirstVoting.get(0).getId())))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
 
-        mockMvc.perform(post("/voting/vote").with(csrf())
+        mockMvc.perform(post("/votings/votes").with(csrf())
                         .with(user(users.get(2).getEmail()).password(users.get(2).getPassword()).roles("USER"))
                         .content(mapper.writeValueAsString(new VoteDTO(optionsForFirstVoting.get(1).getId())))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/voting/result/" + firstVoting.getId().toString()).with(csrf())
+        mockMvc.perform(get("/votings/" + firstVoting.getId().toString() + "/result").with(csrf())
                 .with(adminUserRequest))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.votingDescription")
                         .value(createVotingDTO.description()))

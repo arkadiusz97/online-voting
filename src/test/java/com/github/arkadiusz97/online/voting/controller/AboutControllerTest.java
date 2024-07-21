@@ -34,7 +34,7 @@ public class AboutControllerTest {
         AboutDTO aboutDTO = new AboutDTO(version, date);
         Mockito.when(aboutService.getAbout()).thenReturn(aboutDTO);
 
-        mockMvc.perform(get("/about"))
+        mockMvc.perform(get("/app-details"))
             .andExpect(status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.version").value(version))
             .andExpect(MockMvcResultMatchers.jsonPath("$.startedAt").value(Utils.getFormattedDate(date)));
@@ -45,7 +45,7 @@ public class AboutControllerTest {
         String errorMessage = "error message";
         Mockito.doThrow(new RuntimeException(errorMessage)).when(aboutService).getAbout();
 
-        mockMvc.perform(get("/about"))
+        mockMvc.perform(get("/app-details"))
                 .andExpect(status().is5xxServerError())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                         .value("Internal server error: " + errorMessage));
